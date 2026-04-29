@@ -2,9 +2,8 @@
 #include <iostream>
 
 namespace dae {
-	DeathComponent::DeathComponent(GameObject* pOwner, PlayerComponent* playerComponent)
+	DeathComponent::DeathComponent(GameObject* pOwner)
 		: Component{ pOwner }
-		, m_playerComponent{ playerComponent }
 	{
 	}
 	void DeathComponent::Update(float) {

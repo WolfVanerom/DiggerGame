@@ -1,6 +1,7 @@
 #include "PlayerComponent.h"
 #include "Renderer.h"
 #include <algorithm>
+#include "ServiceLocator.h"
 
 using dae::TunnelDirection;
 using dae::LevelObjectType;
@@ -91,6 +92,9 @@ void dae::PlayerComponent::Update(float deltaTime)
 	{
 		m_score += 100;
 		m_levelManager.SetCell(cellX, cellY, LevelObjectType::empty);
+
+		auto& soundSystem = dae::serviceLocator::GetSoundSystem();
+		soundSystem.playSound(1, 1.f);
 
 		Notify(Event::ScoreChanged, m_parent);
 	}

@@ -4,14 +4,11 @@
 
 namespace dae
 {
-	class PlayerComponent;
 	class TextComponent;
 	class DeathComponent final : public Component, public Observer
 	{
-		PlayerComponent* m_playerComponent{};
-
 	public:
-		DeathComponent(GameObject* pOwner, PlayerComponent* playerComponent);
+		DeathComponent(GameObject* pOwner);
 		void Update(float deltaTime) override;
 		void OnNotify(Event event, GameObject* gameObject) override;
 	};

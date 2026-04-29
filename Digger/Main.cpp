@@ -11,14 +11,11 @@
 #include "TextComponent.h"
 #include "FPSComponent.h"
 #include "TextureComponent.h"
-#include "RotateAroundPivotComponent.h"
-#include "Scene.h"
 #include <filesystem>
 #include <iostream>
 #include <chrono>
 #include <vector>
 #include <string>
-#include "TrashTheCashComponent.h"
 #include "InputManager.h"
 #include "LevelManager.h"
 #include "PlayerComponent.h"
@@ -26,6 +23,8 @@
 #include "ScoreComponent.h"
 #include "LifeComponent.h"
 #include "DeathComponent.h"
+#include "SdlSoundSystem.h"
+#include "ServiceLocator.h"
 namespace fs = std::filesystem;
 
 
@@ -38,6 +37,9 @@ static void load() {
 	#else
 	levelManager->LoadLevel("Data/levelData/1.txt", &scene);
 	#endif
+
+	auto& soundSystem = dae::serviceLocator::GetSoundSystem();
+	soundSystem.registerSound(1, "Data/media/audio/0.mp3");
 
 	//player 1
 
@@ -78,7 +80,7 @@ static void load() {
 	auto* lifeComponentPtr = lifeComponent.get();
 	go->addComponent(std::move(lifeComponent));
 
-	auto deathComponent = std::make_unique<dae::DeathComponent>(go.get(), playerComponentPtr);
+	auto deathComponent = std::make_unique<dae::DeathComponent>(go.get());
 	auto* deathComponentPtr = deathComponent.get();
 	go->addComponent(std::move(deathComponent));
 
@@ -125,7 +127,7 @@ static void load() {
 	auto* lifeComponentPtr2 = lifeComponent2.get();
 	go->addComponent(std::move(lifeComponent2));
 
-	auto deathComponent2 = std::make_unique<dae::DeathComponent>(go.get(), playerComponentPtr2);
+	auto deathComponent2 = std::make_unique<dae::DeathComponent>(go.get());
 	auto* deathComponentPtr2 = deathComponent2.get();
 	go->addComponent(std::move(deathComponent2));
 
@@ -255,5 +257,6 @@ int main(int, char*[]) {
 
 	dae::Minigin engine(data_location);
 	engine.Run(load);
+
 	return 0;
 }
