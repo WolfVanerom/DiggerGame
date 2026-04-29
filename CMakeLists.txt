@@ -67,7 +67,6 @@ if(NOT SDL3_FOUND)
 endif()
 
 # Add SDL3_ttf
-find_package(SDL3_ttf 3.2.2 CONFIG QUIET)
 if(NOT SDL3_ttf_FOUND)
   if (WIN32)
     FetchContent_Declare(
@@ -77,8 +76,8 @@ if(NOT SDL3_ttf_FOUND)
       DOWNLOAD_DIR ${CMAKE_BINARY_DIR}/downloads
     )
     FetchContent_MakeAvailable(SDL3_ttf)
-    set(SDL3_ttf_DIR "${SDL3_ttf_SOURCE_DIR}/cmake")
-    find_package(SDL3_ttf CONFIG REQUIRED)
+
+    # IMPORTANT: do NOT call find_package again
   else()
     FetchContent_Declare(
       SDL3_ttf
