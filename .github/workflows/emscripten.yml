@@ -55,11 +55,17 @@ jobs:
           cd build-web
           cmake --build . --config Release
 
+      - name: Debug build output
+        run: |
+          find build-web -name "digger_web*" || true
+
       - name: Prepare Artifact
         run: |
           mkdir -p dist
-          cp build-web/digger_web.* dist/
-          cp web/*.html dist/
+
+          find build-web -name "digger_web.*" -exec cp {} dist/ \;
+
+          cp -r web/* dist/ || true
 
       - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v3
@@ -72,6 +78,7 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
