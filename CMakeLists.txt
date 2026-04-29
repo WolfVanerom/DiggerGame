@@ -52,7 +52,7 @@ if(NOT SDL3_FOUND)
       DOWNLOAD_DIR ${CMAKE_BINARY_DIR}/downloads
     )
     FetchContent_MakeAvailable(SDL3)
-    list(PREPEND CMAKE_PREFIX_PATH "${SDL3_SOURCE_DIR}")
+    set(SDL3_DIR "${SDL3_SOURCE_DIR}/cmake")
     find_package(SDL3 CONFIG REQUIRED)
   else()
     FetchContent_Declare(
@@ -77,7 +77,7 @@ if(NOT SDL3_ttf_FOUND)
       DOWNLOAD_DIR ${CMAKE_BINARY_DIR}/downloads
     )
     FetchContent_MakeAvailable(SDL3_ttf)
-    list(PREPEND CMAKE_PREFIX_PATH "${SDL3_ttf_SOURCE_DIR}")
+    set(SDL3_ttf_DIR "${SDL3_ttf_SOURCE_DIR}/cmake")
     find_package(SDL3_ttf CONFIG REQUIRED)
   else()
     FetchContent_Declare(

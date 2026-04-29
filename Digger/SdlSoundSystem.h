@@ -18,7 +18,7 @@ namespace dae
 		~SdlSoundSystem() override;
 
 		void playSound(const soundId id, const float volume) override;
-		void registerSound(const soundId id, const std::string& path);
+		void registerSound(const soundId id, const std::string& path) override;
 
 	protected:
 		void processSound(const soundId id, const float volume);
