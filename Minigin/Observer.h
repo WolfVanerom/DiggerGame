@@ -24,16 +24,17 @@ namespace dae {
 	class subject
 	{
 	public:
-		void AddObserver(Observer* observer)
+		virtual void AddObserver(Observer* observer)
 		{
 			m_observers.push_back(observer);
 		}
-		void RemoveObserver(Observer* observer)
+		virtual void RemoveObserver(Observer* observer)
 		{
 			m_observers.erase(std::remove(m_observers.begin(), m_observers.end(), observer), m_observers.end());
 		}
+		virtual ~subject()=0;
 	protected:
-		void Notify(Event event, GameObject* gameObject)
+		virtual void Notify(Event event, GameObject* gameObject)
 		{
 			for (Observer* observer : m_observers)
 			{
@@ -46,31 +47,4 @@ namespace dae {
 
 	class TextComponent;
 	class PlayerComponent;
-
-	class remainingLivesObserver : public Observer
-	{
-	public:
-		explicit remainingLivesObserver(TextComponent* textComponent, PlayerComponent* playerComponent);
-		void OnNotify(Event event, GameObject* gameObject) override;
-	private:
-		TextComponent* m_textComponent{};
-		PlayerComponent* m_playerComponent{};
-	};
-
-	class deathObserver : public Observer
-	{
-	public:
-     void OnNotify(Event event, GameObject* gameObject) override;
-	};
-
-	class scoreObserver : public Observer
-	{
-	public:
-		explicit scoreObserver(TextComponent* textComponent, PlayerComponent* playerComponent);
-		void OnNotify(Event event, GameObject* gameObject) override;
-	private:
-		TextComponent* m_textComponent{};
-		PlayerComponent* m_playerComponent{};
-		bool m_winnerAchievementUnlocked{ false };
-	};
 }

@@ -69,7 +69,11 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   "Minigin/PlayerComponent.h" 
   "Minigin/PlayerComponent.cpp" 
   "Minigin/Observer.h" 
-  "Minigin/Observer.cpp")
+  "Minigin/Observer.cpp"
+  "Minigin/ScoreComponent.cpp"
+  "Minigin/ScoreComponent.h"
+  "Minigin/LifeComponent.h"
+  "Minigin/LifeComponent.cpp" "Minigin/DeathComponent.h" "Minigin/DeathComponent.cpp")
 
 # enable c++20 features
 target_compile_features(${TARGET_NAME} PUBLIC cxx_std_20)
@@ -206,6 +210,7 @@ find_package(Steamworks QUIET)
 target_include_directories("${TARGET_NAME}" PUBLIC
   ${CMAKE_SOURCE_DIR}/Minigin/
   ${glm_SOURCE_DIR}
+  ${glm_SOURCE_DIR}/glm
   ${sdl3_SOURCE_DIR}/include
   ${sdl3_ttf_SOURCE_DIR}/include
   ${imgui_SOURCE_DIR}

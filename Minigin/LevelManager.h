@@ -17,6 +17,25 @@ namespace dae
 		none
 	};
 
+		enum class TunnelDirection
+		{
+			none,
+			left,
+			right,
+			up,
+			down
+		};
+
+		struct TunnelPreview
+		{
+			bool active{ false };
+			int cellX{ -1 };
+			int cellY{ -1 };
+			LevelObjectType type{ LevelObjectType::none };
+			TunnelDirection direction{ TunnelDirection::none };
+			float progress{ 0.f };
+		};
+
 
 	class Scene;
 	class GameObject;
@@ -26,6 +45,8 @@ namespace dae
 		GameObject* m_currentNonEntetyDraw{ nullptr };
 		GameObject* m_currentBackgroundObject{ nullptr };
 		std::vector<std::vector<GameObject*>> m_EntityObjects{};
+		std::vector<std::vector<LevelObjectType>> m_tileObjects{};
+		TunnelPreview m_tunnelPreview{};
 
 		std::vector<std::string> m_currentLevel;
 
@@ -52,5 +73,8 @@ namespace dae
 
 		LevelObjectType GetCell(int x, int y) const;
 		void SetCell(int x, int y, LevelObjectType type);
+      void SetTunnelPreview(int cellX, int cellY, LevelObjectType type, TunnelDirection direction, float progress);
+		void ClearTunnelPreview();
+		const TunnelPreview& GetTunnelPreview() const { return m_tunnelPreview; }
 	};
 }

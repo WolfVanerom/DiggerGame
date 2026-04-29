@@ -1,4 +1,5 @@
 #include "LevelManager.h"
+#include <algorithm>
 #include <filesystem>
 #include <iostream>
 #include <fstream>
@@ -24,16 +25,16 @@ void dae::LevelManager::CreateCurrentNonEntityDrawObject(Scene* scene)
 	auto go = std::make_unique<GameObject>();
 	auto tileMapComponent = std::make_unique<TileMapComponent>(go.get(), m_tileWidth, m_tileHeight);
 
-	std::vector<std::vector<LevelObjectType>> tiles(m_maxHeight, std::vector<LevelObjectType>(m_maxWidth, LevelObjectType::empty));
+ m_tileObjects.assign(m_maxHeight, std::vector<LevelObjectType>(m_maxWidth, LevelObjectType::empty));
 	for (int y = 0; y < m_maxHeight; ++y)
 	{
 		for (int x = 0; x < m_maxWidth; ++x)
 		{
-			tiles[y][x] = CharToType(m_currentLevel[y][x]);
+         m_tileObjects[y][x] = CharToType(m_currentLevel[y][x]);
 		}
 	}
 
-	tileMapComponent->SetTiles(tiles);
+  tileMapComponent->SetTiles(&m_tileObjects);
 	tileMapComponent->SetTileTexture(LevelObjectType::tunnelEnd, std::string(GetTextureForType(LevelObjectType::tunnelEnd)));
 	tileMapComponent->SetTileTexture(LevelObjectType::horizontalTunnel, std::string(GetTextureForType(LevelObjectType::horizontalTunnel)));
 	tileMapComponent->SetTileTexture(LevelObjectType::verticalTunnel, std::string(GetTextureForType(LevelObjectType::verticalTunnel)));
@@ -140,7 +141,7 @@ char dae::LevelManager::TypeToChar(LevelObjectType type) const
 std::string_view dae::LevelManager::GetTextureForType(LevelObjectType type) const
 {
 	static constexpr std::string_view emptyTexture{ "empty" };
-	static constexpr std::string_view tunnelEndTexture{ "media/cback1.png" };
+	static constexpr std::string_view tunnelEndTexture{ "media/ENDTUNNEL.png" };
 	static constexpr std::string_view horizontalTunnelTexture{ "media/blob1.png" };
 	static constexpr std::string_view verticalTunnelTexture{ "media/blob2.png" };
 	static constexpr std::string_view bagTexture{ "media/cfbag.png" };
@@ -224,15 +225,12 @@ void dae::LevelManager::LoadLevel(const std::string& levelFile, Scene* scene)
 	}
 }
 
-void dae::LevelManager::RenderLevel(Scene* scene)
-{
-	(void)scene;
-}
-
 void dae::LevelManager::ClearLevel()
 {
 	m_currentLevel.clear();
+    m_tileObjects.clear();
 	m_EntityObjects.clear();
+   m_tunnelPreview = {};
 }
 
 dae::LevelObjectType dae::LevelManager::GetCell(int x, int y) const
@@ -252,11 +250,36 @@ void dae::LevelManager::SetCell(int x, int y, LevelObjectType type)
 		return;
 	}
 
-	if (type == LevelObjectType::empty && !m_EntityObjects.empty() && m_EntityObjects[y][x] != nullptr)
+	if (type != LevelObjectType::emerald && !m_EntityObjects.empty() && m_EntityObjects[y][x] != nullptr)
 	{
 		m_EntityObjects[y][x]->MarkForDeletion();
 		m_EntityObjects[y][x] = nullptr;
 	}
 
 	m_currentLevel[y][x] = TypeToChar(type);
+   if (!m_tileObjects.empty())
+	{
+		m_tileObjects[y][x] = type;
+	}
+}
+
+void dae::LevelManager::SetTunnelPreview(int cellX, int cellY, LevelObjectType type, TunnelDirection direction, float progress)
+{
+	if (!IsInBounds(cellX, cellY) || m_currentLevel.empty())
+	{
+		m_tunnelPreview = {};
+		return;
+	}
+
+	m_tunnelPreview.active = true;
+	m_tunnelPreview.cellX = cellX;
+	m_tunnelPreview.cellY = cellY;
+	m_tunnelPreview.type = type;
+	m_tunnelPreview.direction = direction;
+	m_tunnelPreview.progress = std::clamp(progress, 0.f, 1.f);
+}
+
+void dae::LevelManager::ClearTunnelPreview()
+{
+	m_tunnelPreview = {};
 }
