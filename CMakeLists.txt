@@ -45,15 +45,16 @@ endif()
 find_package(SDL3 3.4 CONFIG QUIET)
 if(NOT SDL3_FOUND)
   if (WIN32)
+    # On Windows, build SDL3 from source since prebuilt doesn't have CMake config
     FetchContent_Declare(
       SDL3
-      URL https://www.libsdl.org/release/SDL3-devel-3.4.0-VC.zip
-      DOWNLOAD_NO_PROGRESS ON
-      DOWNLOAD_DIR ${CMAKE_BINARY_DIR}/downloads
+      GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
+      GIT_TAG release-3.4.0
+      GIT_SHALLOW TRUE
+      GIT_PROGRESS TRUE
+      UPDATE_DISCONNECTED TRUE
     )
     FetchContent_MakeAvailable(SDL3)
-    set(SDL3_DIR "${SDL3_SOURCE_DIR}/cmake")
-    find_package(SDL3 CONFIG REQUIRED)
   else()
     FetchContent_Declare(
       SDL3
@@ -61,6 +62,7 @@ if(NOT SDL3_FOUND)
       GIT_TAG release-3.4.0
       GIT_SHALLOW TRUE
       GIT_PROGRESS TRUE
+      UPDATE_DISCONNECTED TRUE
     )
     FetchContent_MakeAvailable(SDL3)
   endif()
@@ -71,13 +73,14 @@ if(NOT SDL3_ttf_FOUND)
   if (WIN32)
     FetchContent_Declare(
       SDL3_ttf
-      URL https://www.libsdl.org/projects/SDL_ttf/release/SDL3_ttf-devel-3.2.2-VC.zip
-      DOWNLOAD_NO_PROGRESS ON
-      DOWNLOAD_DIR ${CMAKE_BINARY_DIR}/downloads
+      GIT_REPOSITORY https://github.com/libsdl-org/SDL_ttf.git
+      GIT_TAG release-3.2.2
+      GIT_SHALLOW TRUE
+      GIT_PROGRESS TRUE
+      UPDATE_DISCONNECTED TRUE
     )
+    set(SDL3TTF_INSTALL OFF)
     FetchContent_MakeAvailable(SDL3_ttf)
-
-    # IMPORTANT: do NOT call find_package again
   else()
     FetchContent_Declare(
       SDL3_ttf
@@ -85,6 +88,7 @@ if(NOT SDL3_ttf_FOUND)
       GIT_TAG release-3.2.2
       GIT_SHALLOW TRUE
       GIT_PROGRESS TRUE
+      UPDATE_DISCONNECTED TRUE
     )
     set(SDL3TTF_INSTALL OFF)
     if(EMSCRIPTEN)
@@ -102,15 +106,17 @@ endif()
 # Add SDL3_mixer
 find_package(SDL3_mixer CONFIG QUIET)
 if(NOT SDL3_mixer_FOUND)
-  FetchContent_Declare(
-    SDL3_mixer
-    GIT_REPOSITORY https://github.com/libsdl-org/SDL_mixer.git
-    GIT_TAG release-3.2.0
-    GIT_SHALLOW TRUE
-    GIT_PROGRESS TRUE
-  )
-  set(SDL3MIXER_INSTALL OFF)
-  FetchContent_MakeAvailable(SDL3_mixer)
+  if(NOT EMSCRIPTEN)
+    FetchContent_Declare(
+      SDL3_mixer
+      URL https://github.com/libsdl-org/SDL_mixer/releases/download/release-3.2.0/SDL3_mixer-3.2.0.tar.gz
+      DOWNLOAD_NO_PROGRESS ON
+      DOWNLOAD_DIR ${CMAKE_BINARY_DIR}/downloads
+    )
+    set(SDLMIXER_INSTALL OFF CACHE BOOL "" FORCE)
+    set(SDLMIXER_VENDORED OFF CACHE BOOL "" FORCE)
+    FetchContent_MakeAvailable(SDL3_mixer)
+  endif()
 endif()
 
 # Dear ImGui
@@ -141,23 +147,6 @@ endif()
 target_link_libraries(imgui PUBLIC SDL3::SDL3)
 target_compile_features(imgui PUBLIC cxx_std_20)
 target_compile_definitions(imgui PUBLIC IMGUI_DEFINE_MATH_OPERATORS)
-
-FetchContent_Declare(
-  imgui_plot
-  GIT_REPOSITORY https://github.com/soulthreads/imgui-plot.git
-  GIT_TAG v0.1.0
-  PATCH_COMMAND ${CMAKE_COMMAND} -E echo "Patching imgui_plot for ImGui compatibility..."
-)
-FetchContent_MakeAvailable(imgui_plot)
-
-# Patch imgui_plot for newer ImGui API
-file(READ "${imgui_plot_SOURCE_DIR}/src/imgui_plot.cpp" IMGUI_PLOT_CONTENT)
-string(REPLACE "ItemHoverable(frame_bb, id)" "ItemHoverable(frame_bb, id, ImGuiItemFlags_None)" IMGUI_PLOT_CONTENT "${IMGUI_PLOT_CONTENT}")
-file(WRITE "${imgui_plot_SOURCE_DIR}/src/imgui_plot.cpp" "${IMGUI_PLOT_CONTENT}")
-
-# Configure imgui_plot to use imgui
-target_include_directories(imgui_plot PUBLIC ${imgui_SOURCE_DIR})
-target_link_libraries(imgui_plot PUBLIC imgui)
 
 find_package(VLD CONFIG)
 

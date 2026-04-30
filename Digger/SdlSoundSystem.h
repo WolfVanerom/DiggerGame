@@ -1,6 +1,8 @@
 #pragma once
 #include "SoundSystem.h"
+#ifdef SDL3_mixer_FOUND
 #include <SDL3_mixer/SDL_mixer.h>
+#endif
 #include <condition_variable>
 #include <mutex>
 #include <queue>
@@ -11,6 +13,7 @@
 
 namespace dae
 {
+#ifdef SDL3_mixer_FOUND
 	class SdlSoundSystem final : public soundSystem
 	{
 	public:
@@ -45,4 +48,16 @@ namespace dae
 		std::unordered_map<soundId, MIX_Audio*> m_loadedAudio{};
 		std::vector<MIX_Track*> m_activeTracks{};
 	};
+#else
+	// Stub implementation when SDL3_mixer is not available
+	class SdlSoundSystem final : public soundSystem
+	{
+	public:
+		SdlSoundSystem() = default;
+		~SdlSoundSystem() override = default;
+
+		void playSound(const soundId, const float) override {}
+		void registerSound(const soundId, const std::string&) override {}
+	};
+#endif
 }

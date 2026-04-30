@@ -21,7 +21,12 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
 
 target_compile_features(${TARGET_NAME} PUBLIC cxx_std_20)
 
-target_link_libraries(${TARGET_NAME} PRIVATE minigin SDL3_mixer::SDL3_mixer)
+if(TARGET SDL3_mixer::SDL3_mixer)
+  target_link_libraries(${TARGET_NAME} PRIVATE minigin SDL3_mixer::SDL3_mixer)
+  target_compile_definitions(${TARGET_NAME} PRIVATE SDL3_mixer_FOUND)
+else()
+  target_link_libraries(${TARGET_NAME} PRIVATE minigin)
+endif()
 
 if(EMSCRIPTEN)
   set(EMSCRIPTEN_COMPILE_FLAGS "${EMSCRIPTEN_LINK_FLAGS} -g")
@@ -50,8 +55,11 @@ elseif(WIN32)
   set(SDL_RUNTIME_DLLS
     SDL3::SDL3
     SDL3_ttf::SDL3_ttf
-    SDL3_mixer::SDL3_mixer
   )
+  
+  if(TARGET SDL3_mixer::SDL3_mixer)
+    list(APPEND SDL_RUNTIME_DLLS SDL3_mixer::SDL3_mixer)
+  endif()
 
   foreach(dllTarget IN LISTS SDL_RUNTIME_DLLS)
     add_custom_command(
