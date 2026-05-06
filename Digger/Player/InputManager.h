@@ -37,9 +37,9 @@ namespace dae
 
 	class moveCommand : public GameObjectCommand {
 	private:
+		dae::PlayerComponent* m_playerComponent;
 		float m_offsetX;
 		float m_offsetY;
-		dae::PlayerComponent* m_playerComponent;
 	public:
 		moveCommand(dae::GameObject* gameObject, PlayerComponent* playerComponent, float offsetX, float offsetY)
 			: GameObjectCommand(gameObject), m_playerComponent(playerComponent), m_offsetX(offsetX), m_offsetY(offsetY) {
@@ -84,6 +84,8 @@ namespace dae
 				break;
 			case TunnelDirection::down:
 				offsetY = 10.f;
+				break;
+			case TunnelDirection::none:
 				break;
 			}
 
