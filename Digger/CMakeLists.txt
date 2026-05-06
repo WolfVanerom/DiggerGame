@@ -10,6 +10,8 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   Main.cpp
   FPSComponent.cpp
   Level/EmeraldComponent.cpp
+  Level/GoldComponent.cpp
+  Level/GoldState.cpp
   Level/LevelManager.cpp
   Level/TileMapComponent.cpp
   Player/DeathComponent.cpp
@@ -17,7 +19,7 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   Player/LifeComponent.cpp
   Player/PlayerComponent.cpp
   Player/ScoreComponent.cpp
- "SdlSoundSystem.h" "SdlSoundSystem.cpp")
+ "SdlSoundSystem.h" "SdlSoundSystem.cpp" "Level/GoldComponent.h" "Level/GoldState.h")
 
 target_compile_features(${TARGET_NAME} PUBLIC cxx_std_20)
 

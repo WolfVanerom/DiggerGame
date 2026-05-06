@@ -62,15 +62,16 @@ static void load() {
 	go->SetPosition(180, 200);
 	auto textureComponent = std::make_unique<dae::TextureComponent>(go.get());
 	textureComponent->SetTexture("cldig1.png");
-	dae::InputManager::GetInstance().AddCommand(SDLK_W, std::make_unique<dae::moveCommand>(go.get(), 0.0f, -10.0f));
-	dae::InputManager::GetInstance().AddCommand(SDLK_S, std::make_unique<dae::moveCommand>(go.get(), 0.0f, 10.0f));
-	dae::InputManager::GetInstance().AddCommand(SDLK_A, std::make_unique<dae::moveCommand>(go.get(), -10.0f, 0.0f));
-	dae::InputManager::GetInstance().AddCommand(SDLK_D, std::make_unique<dae::moveCommand>(go.get(), 10.0f, 0.0f));
 	go->addComponent(std::move(textureComponent));
-    auto playerComponent = std::make_unique<dae::PlayerComponent>(go.get());
+	auto playerComponent = std::make_unique<dae::PlayerComponent>(go.get());
 	auto* playerComponentPtr = playerComponent.get();
-	dae::InputManager::GetInstance().AddCommand(SDLK_SPACE, std::make_unique<dae::damageCommand>(go.get(), playerComponentPtr));
 	go->addComponent(std::move(playerComponent));
+	
+	dae::InputManager::GetInstance().AddCommand(SDLK_W, std::make_unique<dae::moveCommand>(go.get(), playerComponentPtr, 0.0f, -10.0f));
+	dae::InputManager::GetInstance().AddCommand(SDLK_S, std::make_unique<dae::moveCommand>(go.get(), playerComponentPtr, 0.0f, 10.0f));
+	dae::InputManager::GetInstance().AddCommand(SDLK_A, std::make_unique<dae::moveCommand>(go.get(), playerComponentPtr, -10.0f, 0.0f));
+	dae::InputManager::GetInstance().AddCommand(SDLK_D, std::make_unique<dae::moveCommand>(go.get(), playerComponentPtr, 10.0f, 0.0f));
+	dae::InputManager::GetInstance().AddCommand(SDLK_SPACE, std::make_unique<dae::damageCommand>(go.get(), playerComponentPtr));
 
 	auto scoreComponent = std::make_unique<dae::ScoreComponent>(go.get(), playerComponentPtr, scoreTextComponentPtr);
 	auto* scoreComponentPtr = scoreComponent.get();
@@ -109,15 +110,16 @@ static void load() {
 	go->SetPosition(220, 200);
 	textureComponent = std::make_unique<dae::TextureComponent>(go.get());
 	textureComponent->SetTexture("cldig1.png");
-	dae::InputManager::GetInstance().AddCommand(SDLK_UP, std::make_unique<dae::moveCommand>(go.get(), 0.0f, -10.0f));
-	dae::InputManager::GetInstance().AddCommand(SDLK_DOWN, std::make_unique<dae::moveCommand>(go.get(), 0.0f, 10.0f));
-	dae::InputManager::GetInstance().AddCommand(SDLK_LEFT, std::make_unique<dae::moveCommand>(go.get(), -10.0f, 0.0f));
-	dae::InputManager::GetInstance().AddCommand(SDLK_RIGHT, std::make_unique<dae::moveCommand>(go.get(), 10.0f, 0.0f));
 	go->addComponent(std::move(textureComponent));
 	playerComponent = std::make_unique<dae::PlayerComponent>(go.get());
 	auto* playerComponentPtr2 = playerComponent.get();
-	dae::InputManager::GetInstance().AddCommand(SDLK_RSHIFT, std::make_unique<dae::damageCommand>(go.get(), playerComponentPtr2));
 	go->addComponent(std::move(playerComponent));
+	
+	dae::InputManager::GetInstance().AddCommand(SDLK_UP, std::make_unique<dae::moveCommand>(go.get(), playerComponentPtr2, 0.0f, -10.0f));
+	dae::InputManager::GetInstance().AddCommand(SDLK_DOWN, std::make_unique<dae::moveCommand>(go.get(), playerComponentPtr2, 0.0f, 10.0f));
+	dae::InputManager::GetInstance().AddCommand(SDLK_LEFT, std::make_unique<dae::moveCommand>(go.get(), playerComponentPtr2, -10.0f, 0.0f));
+	dae::InputManager::GetInstance().AddCommand(SDLK_RIGHT, std::make_unique<dae::moveCommand>(go.get(), playerComponentPtr2, 10.0f, 0.0f));
+	dae::InputManager::GetInstance().AddCommand(SDLK_RSHIFT, std::make_unique<dae::damageCommand>(go.get(), playerComponentPtr2));
 
 	auto scoreComponent2 = std::make_unique<dae::ScoreComponent>(go.get(), playerComponentPtr2, scoreTextComponentPtr);
 	auto* scoreComponentPtr2 = scoreComponent2.get();

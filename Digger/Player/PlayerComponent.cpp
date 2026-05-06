@@ -55,7 +55,7 @@ void dae::PlayerComponent::Update(float deltaTime)
 	const float worldY = worldPos.y;
 	const float deltaX = worldX - m_previousWorldX;
 	const float deltaY = worldY - m_previousWorldY;
-	const auto movementDirection = GetDirectionFromDelta(deltaX, deltaY, m_previousMovementDirection);
+	auto movementDirection = GetDirectionFromDelta(deltaX, deltaY, m_previousMovementDirection);
 	const auto trailType = GetTrailType(movementDirection);
 
 	float probeX = worldX;
@@ -77,6 +77,7 @@ void dae::PlayerComponent::Update(float deltaTime)
 	else if (movementDirection == TunnelDirection::up)
 	{
 		probeX += LevelManager::m_tileWidth * 0.30f;
+		probeY += LevelManager::m_tileHeight * 0.15f;
 	}
 	else
 	{
@@ -97,6 +98,19 @@ void dae::PlayerComponent::Update(float deltaTime)
 		soundSystem.playSound(1, 1.f);
 
 		Notify(Event::ScoreChanged, m_parent);
+
+		m_levelManager.CheckIfLevelCompleted();
+	}
+	else if(m_levelManager.GetCell(cellX, cellY) == LevelObjectType::bag)
+	{
+		SDL_Log("Gold collected at cell (%d, %d)", cellX, cellY);
+		m_score += 250;
+		m_levelManager.SetCell(cellX, cellY, LevelObjectType::empty);
+
+		auto& soundSystem = dae::serviceLocator::GetSoundSystem();
+		soundSystem.playSound(1, 1.f);
+
+		Notify(Event::ScoreChanged, m_parent);
 	}
 
 	if (!m_hasPreviousCell)
@@ -107,6 +121,7 @@ void dae::PlayerComponent::Update(float deltaTime)
 		m_previousWorldX = worldX;
 		m_previousWorldY = worldY;
 		m_previousMovementDirection = movementDirection;
+		m_lockedMovementDirection = movementDirection;
 		m_levelManager.ClearTunnelPreview();
 		return;
 	}
@@ -115,42 +130,53 @@ void dae::PlayerComponent::Update(float deltaTime)
 	{
 		const float cellOriginX = static_cast<float>(cellX) * LevelManager::m_tileWidth;
 		const float cellOriginY = static_cast<float>(cellY) * LevelManager::m_tileHeight;
-		float progress = 0.f;
+
+		if (m_tunnelProgress > 0.f) {
+			m_isInTunnel = true;
+		}
 
 		if (movementDirection == TunnelDirection::left)
 		{
 			m_parent->SetPosition(worldX, cellOriginY + (LevelManager::m_tileHeight * 0.15f));
-			progress = (cellOriginX + LevelManager::m_tileWidth - probeX) / LevelManager::m_tileWidth;
+			m_tunnelProgress = (cellOriginX + LevelManager::m_tileWidth - probeX) / LevelManager::m_tileWidth;
 		}
 		else if (movementDirection == TunnelDirection::right)
 		{
 			m_parent->SetPosition(worldX, cellOriginY + (LevelManager::m_tileHeight * 0.15f));
-			progress = (probeX - cellOriginX) / LevelManager::m_tileWidth;
+			m_tunnelProgress = (probeX - cellOriginX) / LevelManager::m_tileWidth;
 		}
 		else if (movementDirection == TunnelDirection::up)
 		{
-			m_parent->SetPosition(cellOriginX + (LevelManager::m_tileWidth * 0.20f), worldY);
-            progress = (cellOriginY + LevelManager::m_tileHeight - probeY) / LevelManager::m_tileHeight;
+			m_parent->SetPosition(cellOriginX + (LevelManager::m_tileWidth * 0.15f), worldY);
+			m_tunnelProgress = (cellOriginY + LevelManager::m_tileHeight - probeY) / LevelManager::m_tileHeight;
 		}
 		else if (movementDirection == TunnelDirection::down)
 		{
-			m_parent->SetPosition(cellOriginX + (LevelManager::m_tileWidth * 0.20f), worldY);
-			progress = (probeY - cellOriginY) / LevelManager::m_tileHeight;
+			m_parent->SetPosition(cellOriginX + (LevelManager::m_tileWidth * 0.15f), worldY);
+			m_tunnelProgress = (probeY - cellOriginY) / LevelManager::m_tileHeight;
 		}
 
-		m_levelManager.SetTunnelPreview(cellX, cellY, trailType, movementDirection, progress);
+
+		m_levelManager.SetTunnelPreview(cellX, cellY, trailType, movementDirection, m_tunnelProgress);
+
+		SDL_Log("Tunnel progress: %f", m_tunnelProgress);
+
+		if (m_tunnelProgress >= 0.8f)
+		{
+			m_levelManager.SetCell(cellX, cellY, trailType);
+
+			m_previousCellX = cellX;
+			m_previousCellY = cellY;
+
+			m_isInTunnel = false;
+
+			m_tunnelProgress = 0.f;
+		}
+
 	}
 	else
 	{
 		m_levelManager.ClearTunnelPreview();
-	}
-
-	if (hasMovedToNewCell)
-	{
-		m_levelManager.SetCell(m_previousCellX, m_previousCellY, trailType);
-
-		m_previousCellX = cellX;
-		m_previousCellY = cellY;
 	}
 
 	const auto& finalWorldPos = m_parent->GetWorldPosition();

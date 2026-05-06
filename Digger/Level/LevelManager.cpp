@@ -8,6 +8,7 @@
 #include "TileMapComponent.h"
 #include "TextureComponent.h"
 #include "EmeraldComponent.h"
+#include "GoldComponent.h"
 
 void dae::LevelManager::CreateCurrentNonEntityDrawObject(Scene* scene)
 {
@@ -18,14 +19,14 @@ void dae::LevelManager::CreateCurrentNonEntityDrawObject(Scene* scene)
 
 	if (m_currentNonEntetyDraw != nullptr)
 	{
-		scene->Remove(*m_currentNonEntetyDraw);
+		m_currentNonEntetyDraw->MarkForDeletion();
 		m_currentNonEntetyDraw = nullptr;
 	}
 
 	auto go = std::make_unique<GameObject>();
 	auto tileMapComponent = std::make_unique<TileMapComponent>(go.get(), m_tileWidth, m_tileHeight);
 
- m_tileObjects.assign(m_maxHeight, std::vector<LevelObjectType>(m_maxWidth, LevelObjectType::empty));
+	m_tileObjects.assign(m_maxHeight, std::vector<LevelObjectType>(m_maxWidth, LevelObjectType::empty));
 	for (int y = 0; y < m_maxHeight; ++y)
 	{
 		for (int x = 0; x < m_maxWidth; ++x)
@@ -34,11 +35,10 @@ void dae::LevelManager::CreateCurrentNonEntityDrawObject(Scene* scene)
 		}
 	}
 
-  tileMapComponent->SetTiles(&m_tileObjects);
+	tileMapComponent->SetTiles(&m_tileObjects);
 	tileMapComponent->SetTileTexture(LevelObjectType::tunnelEnd, std::string(GetTextureForType(LevelObjectType::tunnelEnd)));
 	tileMapComponent->SetTileTexture(LevelObjectType::horizontalTunnel, std::string(GetTextureForType(LevelObjectType::horizontalTunnel)));
 	tileMapComponent->SetTileTexture(LevelObjectType::verticalTunnel, std::string(GetTextureForType(LevelObjectType::verticalTunnel)));
-	tileMapComponent->SetTileTexture(LevelObjectType::bag, std::string(GetTextureForType(LevelObjectType::bag)));
 
 	go->addComponent(std::move(tileMapComponent));
 	m_currentNonEntetyDraw = go.get();
@@ -54,7 +54,7 @@ void dae::LevelManager::CreateCurrentBackgroundObject(Scene* scene)
 
 	if (m_currentBackgroundObject != nullptr)
 	{
-		scene->Remove(*m_currentBackgroundObject);
+		m_currentBackgroundObject->MarkForDeletion();
 		m_currentBackgroundObject = nullptr;
 	}
 
@@ -93,14 +93,40 @@ void dae::LevelManager::SpawnLevelObject(LevelObjectType type, int x, int y, Sce
 		scene->Add(std::move(go));
 		m_amountOfEmeralds++;
 	}
-	//TODO: Implement this function to spawn the appropriate game object based on the type
+	else if (type == LevelObjectType::bag)
+	{
+		if (scene == nullptr || m_currentLevel.empty() || !IsInBounds(x, y))
+		{
+			return;
+		}
+
+		auto go = std::make_unique<GameObject>();
+
+		go->SetPosition(x * m_tileWidth, y * m_tileHeight);
+
+		auto textureComponent = std::make_unique<TextureComponent>(go.get());
+		textureComponent->SetTexture(std::string(GetTextureForType(type)));
+		textureComponent->SetDrawSize(m_tileWidth, m_tileHeight);
+		go->addComponent(std::move(textureComponent));
+
+		auto goldComponent = std::make_unique<GoldComponent>(go.get());
+		go->addComponent(std::move(goldComponent));
+
+		m_EntityObjects[y][x] = go.get();
+		scene->Add(std::move(go));
+	}
 }
 
 void dae::LevelManager::CheckIfLevelCompleted()
 {
 	if (m_amountOfEmeralds <= 0)
 	{
-		LoadLevel("Data/levelData/2.txt", m_currentScene);
+		m_currentLevelIndex++;
+		QueueLevelLoad("Data/levelData/" + std::to_string(m_currentLevelIndex) + ".txt", m_currentScene);
+		return;
+	}
+	else {
+		m_amountOfEmeralds--;
 	}
 }
 
@@ -221,14 +247,14 @@ void dae::LevelManager::LoadLevel(const std::string& levelFile, Scene* scene)
 	m_EntityObjects.assign(m_maxHeight, std::vector<GameObject*>(m_maxWidth, nullptr));
 	CreateCurrentBackgroundObject(scene);
 	CreateCurrentNonEntityDrawObject(scene);
-
+	bool onebag = false;
 	for (int y = 0; y < m_maxHeight; ++y)
 	{
 		for (int x = 0; x < m_maxWidth; ++x)
 		{
 			const char c = m_currentLevel[y][x];
 			const LevelObjectType type = CharToType(c);
-			if (type == LevelObjectType::emerald)
+			if (type == LevelObjectType::emerald || type == LevelObjectType::bag)
 			{
 				SpawnLevelObject(type, x, y, scene);
 			}
@@ -240,8 +266,22 @@ void dae::LevelManager::ClearLevel()
 {
 	m_currentLevel.clear();
     m_tileObjects.clear();
+    if (!m_EntityObjects.empty())
+	{
+		for (auto& row : m_EntityObjects)
+		{
+			for (auto& object : row)
+			{
+				if (object != nullptr)
+				{
+					object->MarkForDeletion();
+					object = nullptr;
+				}
+			}
+		}
+	}
 	m_EntityObjects.clear();
-   m_tunnelPreview = {};
+	m_tunnelPreview = {};
 }
 
 dae::LevelObjectType dae::LevelManager::GetCell(int x, int y) const
@@ -274,6 +314,29 @@ void dae::LevelManager::SetCell(int x, int y, LevelObjectType type)
 	}
 }
 
+void dae::LevelManager::MoveEntityCell(int fromX, int fromY, int toX, int toY, LevelObjectType newType)
+{
+	if (!IsInBounds(fromX, fromY) || !IsInBounds(toX, toY) || m_currentLevel.empty())
+	{
+		return;
+	}
+
+	if (!m_EntityObjects.empty() && m_EntityObjects[fromY][fromX] != nullptr)
+	{
+		m_EntityObjects[toY][toX] = m_EntityObjects[fromY][fromX];
+		m_EntityObjects[fromY][fromX] = nullptr;
+	}
+
+	m_currentLevel[fromY][fromX] = TypeToChar(LevelObjectType::empty);
+	m_currentLevel[toY][toX] = TypeToChar(newType);
+
+	if (!m_tileObjects.empty())
+	{
+		m_tileObjects[fromY][fromX] = LevelObjectType::empty;
+		m_tileObjects[toY][toX] = newType;
+	}
+}
+
 void dae::LevelManager::SetTunnelPreview(int cellX, int cellY, LevelObjectType type, TunnelDirection direction, float progress)
 {
 	if (!IsInBounds(cellX, cellY) || m_currentLevel.empty())
@@ -293,4 +356,19 @@ void dae::LevelManager::SetTunnelPreview(int cellX, int cellY, LevelObjectType t
 void dae::LevelManager::ClearTunnelPreview()
 {
 	m_tunnelPreview = {};
+}
+
+void dae::LevelManager::QueueLevelLoad(const std::string& levelFile, Scene* scene)
+{
+	m_pendingLevelLoad = std::make_pair(levelFile, scene);
+}
+
+void dae::LevelManager::ProcessPendingLevelLoad()
+{
+	if (m_pendingLevelLoad.has_value())
+	{
+		ClearLevel();
+		LoadLevel(m_pendingLevelLoad->first, m_pendingLevelLoad->second);
+		m_pendingLevelLoad.reset();
+	}
 }

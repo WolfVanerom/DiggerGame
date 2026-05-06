@@ -18,6 +18,7 @@
 #include "ResourceManager.h"
 #include "ServiceLocator.h"
 #include "SdlSoundSystem.h"
+#include "LevelManager.h"
 
 #if USE_STEAMWORKS
 #pragma warning (push)
@@ -96,8 +97,7 @@ dae::Minigin::Minigin(const std::filesystem::path& dataPath)
 dae::Minigin::~Minigin()
 {
 	Renderer::GetInstance().Destroy();
-	auto& soundSystem = dae::serviceLocator::GetSoundSystem();
-	soundSystem.~soundSystem();
+	dae::serviceLocator::RegisterSoundSystem(nullptr);
 	SDL_DestroyWindow(g_window);
 	g_window = nullptr;
 	SDL_Quit();
@@ -135,6 +135,7 @@ void dae::Minigin::RunOneFrame()
 		m_accLag -= m_fixedTimeStep;
 	}
 	SceneManager::GetInstance().Update(deltaTime);
+	LevelManager::GetInstance().ProcessPendingLevelLoad();
 	Renderer::GetInstance().Render();
 
 	const auto sleepTime = currentTime + std::chrono::milliseconds(m_sleepTime) - std::chrono::high_resolution_clock::now();

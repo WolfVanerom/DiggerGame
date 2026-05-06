@@ -2,6 +2,7 @@
 #include "Singleton.h"
 #include "GameObject.h"
 #include "PlayerComponent.h"
+#include <cmath>
 #include <memory>
 #include <unordered_map>
 
@@ -38,14 +39,56 @@ namespace dae
 	private:
 		float m_offsetX;
 		float m_offsetY;
+		dae::PlayerComponent* m_playerComponent;
 	public:
-		moveCommand(dae::GameObject* gameObject, float offsetX, float offsetY)
-			: GameObjectCommand(gameObject), m_offsetX(offsetX), m_offsetY(offsetY) {
+		moveCommand(dae::GameObject* gameObject, PlayerComponent* playerComponent, float offsetX, float offsetY)
+			: GameObjectCommand(gameObject), m_playerComponent(playerComponent), m_offsetX(offsetX), m_offsetY(offsetY) {
 		}
 
 		void Execute() override {
+			if (m_playerComponent == nullptr)
+			{
+				return;
+			}
+
+			if (m_offsetX < 0.f)
+			{
+				m_playerComponent->SetLockedMovementDirection(TunnelDirection::left);
+			}
+			else if (m_offsetX > 0.f)
+			{
+				m_playerComponent->SetLockedMovementDirection(TunnelDirection::right);
+			}
+			else if (m_offsetY < 0.f)
+			{
+				m_playerComponent->SetLockedMovementDirection(TunnelDirection::up);
+			}
+			else if (m_offsetY > 0.f)
+			{
+				m_playerComponent->SetLockedMovementDirection(TunnelDirection::down);
+			}
+
+			float offsetX = m_offsetX;
+			float offsetY = m_offsetY;
+
+			switch (m_playerComponent->GetLockedMovementDirection())
+			{
+			case TunnelDirection::left:
+				offsetX = -10.f;
+				break;
+			case TunnelDirection::right:
+				offsetX = 10.f;
+				break;
+			case TunnelDirection::up:
+				offsetY = -10.f;
+				break;
+			case TunnelDirection::down:
+				offsetY = 10.f;
+				break;
+			}
+
 			auto pos = GetGameObject()->GetWorldPosition();
-			GetGameObject()->SetPosition(pos.x + m_offsetX, pos.y + m_offsetY);
+			GetGameObject()->SetPosition(pos.x + offsetX, pos.y + offsetY);
 		}
 	};
 

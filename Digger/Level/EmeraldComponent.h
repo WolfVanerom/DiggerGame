@@ -12,7 +12,5 @@ namespace dae {
 		EmeraldComponent(EmeraldComponent&& other) = delete;
 		EmeraldComponent& operator=(const EmeraldComponent& other) = delete;
 		EmeraldComponent& operator=(EmeraldComponent&& other) = delete;
-		void giveEmerald() const;
 	};
-
 }

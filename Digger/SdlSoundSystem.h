@@ -43,6 +43,7 @@ namespace dae
 		bool m_running{ true };
 		std::thread m_workerThread{};
 
+		std::mutex m_audioMutex{};
 		MIX_Mixer* m_mixer{};
 		std::unordered_map<soundId, std::string> m_soundPaths{};
 		std::unordered_map<soundId, MIX_Audio*> m_loadedAudio{};

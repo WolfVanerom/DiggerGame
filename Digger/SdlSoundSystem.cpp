@@ -42,13 +42,6 @@ namespace dae
 		}
 		m_activeTracks.clear();
 
-		for (const auto& [id, audio] : m_loadedAudio)
-		{
-			static_cast<void>(id);
-			MIX_DestroyAudio(audio);
-		}
-		m_loadedAudio.clear();
-
 		if (m_mixer != nullptr)
 		{
 			MIX_DestroyMixer(m_mixer);
@@ -69,7 +62,7 @@ namespace dae
 
 	void SdlSoundSystem::registerSound(const soundId id, const std::string& path)
 	{
-		std::lock_guard lock(m_queueMutex);
+		std::lock_guard lock(m_audioMutex);
 		m_soundPaths[id] = path;
 	}
 
@@ -80,35 +73,39 @@ namespace dae
 			return;
 		}
 
-		MIX_Audio* audio = getOrLoadAudio(id);
-		if (audio == nullptr)
+		MIX_Audio* audio;
 		{
-			return;
-		}
+			std::lock_guard lock(m_audioMutex);
+			audio = getOrLoadAudio(id);
+			if (audio == nullptr)
+			{
+				return;
+			}
 
-		MIX_Track* track = MIX_CreateTrack(m_mixer);
-		if (track == nullptr)
-		{
-			return;
-		}
+			MIX_Track* track = MIX_CreateTrack(m_mixer);
+			if (track == nullptr)
+			{
+				return;
+			}
 
-		if (!MIX_SetTrackAudio(track, audio))
-		{
-			MIX_DestroyTrack(track);
-			return;
-		}
+			if (!MIX_SetTrackAudio(track, audio))
+			{
+				MIX_DestroyTrack(track);
+				return;
+			}
 
-		if (!MIX_SetTrackGain(track, std::clamp(volume, 0.0f, 1.0f)))
-		{
-		}
+			if (!MIX_SetTrackGain(track, std::clamp(volume, 0.0f, 1.0f)))
+			{
+			}
 
-		if (!MIX_PlayTrack(track, 0))
-		{
-			MIX_DestroyTrack(track);
-			return;
-		}
+			if (!MIX_PlayTrack(track, 0))
+			{
+				MIX_DestroyTrack(track);
+				return;
+			}
 
-		m_activeTracks.push_back(track);
+			m_activeTracks.push_back(track);
+		}
 	}
 
 	void SdlSoundSystem::workerLoop()
@@ -162,6 +159,7 @@ namespace dae
 
 	void SdlSoundSystem::cleanupFinishedTracks()
 	{
+		std::lock_guard lock(m_audioMutex);
 		auto newEnd = std::remove_if(m_activeTracks.begin(), m_activeTracks.end(), [](MIX_Track* track)
 			{
 				if (track == nullptr)
