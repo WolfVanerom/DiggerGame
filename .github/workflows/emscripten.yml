@@ -57,7 +57,7 @@ jobs:
 
       - name: Debug build output
         run: |
-          find build-web -name "digger_web*" or true
+          find build-web -name "digger_web*" || true
 
       - name: Prepare Artifact
         run: |
@@ -65,7 +65,7 @@ jobs:
 
           find build-web -name "digger_web.*" -exec cp {} dist/ \;
 
-          cp -r web/* dist/ or true
+          cp -r web/* dist/ || true
 
       - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v3
