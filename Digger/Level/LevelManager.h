@@ -82,7 +82,7 @@ namespace dae
 
 		LevelObjectType GetCell(int x, int y) const;
 		void SetCell(int x, int y, LevelObjectType type);
-		void MoveEntityCell(int fromX, int fromY, int toX, int toY, LevelObjectType newType);
+		void MoveEntityCell(int fromX, int fromY, int toX, int toY, LevelObjectType newType, bool moveTexture);
 		void SetTunnelPreview(int cellX, int cellY, LevelObjectType type, TunnelDirection direction, float progress);
 		void ClearTunnelPreview();
 		const TunnelPreview& GetTunnelPreview() const { return m_tunnelPreview; }

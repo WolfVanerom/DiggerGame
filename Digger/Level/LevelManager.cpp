@@ -13,7 +13,7 @@
 
 void dae::LevelManager::CreateCurrentNonEntityDrawObject(Scene* scene)
 {
-	if (scene == nullptr || m_currentLevel.empty())
+	if (scene == nullptr or m_currentLevel.empty())
 	{
 		return;
 	}
@@ -73,7 +73,7 @@ void dae::LevelManager::CreateCurrentBackgroundObject(Scene* scene)
 void dae::LevelManager::SpawnLevelObject(LevelObjectType type, int x, int y, Scene* scene)
 {
 	if (type == LevelObjectType::emerald){
-		if (scene == nullptr || m_currentLevel.empty() || !IsInBounds(x, y))
+		if (scene == nullptr or m_currentLevel.empty() or !IsInBounds(x, y))
 		{
 			return;
 		}
@@ -96,7 +96,7 @@ void dae::LevelManager::SpawnLevelObject(LevelObjectType type, int x, int y, Sce
 	}
 	else if (type == LevelObjectType::bag)
 	{
-		if (scene == nullptr || m_currentLevel.empty() || !IsInBounds(x, y))
+		if (scene == nullptr or m_currentLevel.empty() or !IsInBounds(x, y))
 		{
 			return;
 		}
@@ -257,7 +257,7 @@ void dae::LevelManager::LoadLevel(const std::string& levelFile, Scene* scene)
 		{
 			const char c = m_currentLevel[y][x];
 			const LevelObjectType type = CharToType(c);
-			if (type == LevelObjectType::emerald || type == LevelObjectType::bag)
+			if (type == LevelObjectType::emerald or type == LevelObjectType::bag)
 			{
 				SpawnLevelObject(type, x, y, scene);
 			}
@@ -289,7 +289,7 @@ void dae::LevelManager::ClearLevel()
 
 dae::LevelObjectType dae::LevelManager::GetCell(int x, int y) const
 {
-	if (!IsInBounds(x, y) || m_currentLevel.empty())
+	if (!IsInBounds(x, y) or m_currentLevel.empty())
 	{
 		return LevelObjectType::none;
 	}
@@ -299,27 +299,43 @@ dae::LevelObjectType dae::LevelManager::GetCell(int x, int y) const
 
 void dae::LevelManager::SetCell(int x, int y, LevelObjectType type)
 {
-	if (!IsInBounds(x, y) || m_currentLevel.empty())
+	if (!IsInBounds(x, y) or m_currentLevel.empty())
 	{
 		return;
 	}
 
-	if (type != LevelObjectType::emerald && !m_EntityObjects.empty() && m_EntityObjects[y][x] != nullptr)
+	auto currentType = GetCell(x, y);
+
+	if (currentType == LevelObjectType::emerald && !m_EntityObjects.empty() && m_EntityObjects[y][x] != nullptr)
 	{
 		m_EntityObjects[y][x]->MarkForDeletion();
 		m_EntityObjects[y][x] = nullptr;
 	}
 
+	if (currentType == LevelObjectType::bag && !m_EntityObjects.empty() && m_EntityObjects[y][x] != nullptr)
+	{
+		auto goldComponent = static_cast<GoldComponent*>(m_EntityObjects[y][x]->getComponent(typeid(GoldComponent)));
+		if (goldComponent != nullptr && goldComponent->HasBroken())
+		{
+			m_EntityObjects[y][x]->MarkForDeletion();
+			m_EntityObjects[y][x] = nullptr;
+		}
+		else
+		{
+			return;
+		}
+	}
+
 	m_currentLevel[y][x] = TypeToChar(type);
-   if (!m_tileObjects.empty())
+	if (!m_tileObjects.empty())
 	{
 		m_tileObjects[y][x] = type;
 	}
 }
 
-void dae::LevelManager::MoveEntityCell(int fromX, int fromY, int toX, int toY, LevelObjectType newType)
+void dae::LevelManager::MoveEntityCell(int fromX, int fromY, int toX, int toY, LevelObjectType newType, bool moveTexture)
 {
-	if (!IsInBounds(fromX, fromY) || !IsInBounds(toX, toY) || m_currentLevel.empty())
+	if (!IsInBounds(fromX, fromY) or !IsInBounds(toX, toY) or m_currentLevel.empty())
 	{
 		return;
 	}
@@ -333,7 +349,7 @@ void dae::LevelManager::MoveEntityCell(int fromX, int fromY, int toX, int toY, L
 	m_currentLevel[fromY][fromX] = TypeToChar(LevelObjectType::empty);
 	m_currentLevel[toY][toX] = TypeToChar(newType);
 
-	if (!m_tileObjects.empty())
+	if (!m_tileObjects.empty() and moveTexture)
 	{
 		m_tileObjects[fromY][fromX] = LevelObjectType::empty;
 		m_tileObjects[toY][toX] = newType;
@@ -342,7 +358,7 @@ void dae::LevelManager::MoveEntityCell(int fromX, int fromY, int toX, int toY, L
 
 void dae::LevelManager::SetTunnelPreview(int cellX, int cellY, LevelObjectType type, TunnelDirection direction, float progress)
 {
-	if (!IsInBounds(cellX, cellY) || m_currentLevel.empty())
+	if (!IsInBounds(cellX, cellY) or m_currentLevel.empty())
 	{
 		m_tunnelPreview = {};
 		return;

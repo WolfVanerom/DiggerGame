@@ -19,10 +19,12 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   Player/LifeComponent.cpp
   Player/PlayerComponent.cpp
   Player/ScoreComponent.cpp
-  SdlSoundSystem.h 
   SdlSoundSystem.cpp 
-  Level/GoldComponent.h
-  Level/GoldState.h)
+  Level/GoldComponent.cpp
+  Level/GoldState.cpp
+  Enemy/EnemySpawnManager.cpp
+  Enemy/EnemyComponent.cpp
+  Enemy/EnemyState.cpp "Enemy/EnemySpawnUpdateComponent.cpp" "Player/ProjectileComponent.cpp")
 
 target_compile_features(${TARGET_NAME} PUBLIC cxx_std_20)
 

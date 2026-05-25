@@ -25,12 +25,12 @@ TunnelDirection GetDirectionFromDelta(float deltaX, float deltaY, TunnelDirectio
 
 dae::LevelObjectType GetTrailType(TunnelDirection direction)
 {
-	if (direction == TunnelDirection::left || direction == TunnelDirection::right)
+	if (direction == TunnelDirection::left or direction == TunnelDirection::right)
 	{
 		return LevelObjectType::horizontalTunnel;
 	}
 
-	if (direction == TunnelDirection::up || direction == TunnelDirection::down)
+	if (direction == TunnelDirection::up or direction == TunnelDirection::down)
 	{
 		return LevelObjectType::verticalTunnel;
 	}
@@ -87,7 +87,7 @@ void dae::PlayerComponent::Update(float deltaTime)
 
 	const int cellX = static_cast<int>(probeX / LevelManager::m_tileWidth);
 	const int cellY = static_cast<int>(probeY / LevelManager::m_tileHeight);
-	const bool hasMovedToNewCell = m_hasPreviousCell && (cellX != m_previousCellX || cellY != m_previousCellY);
+	const bool hasMovedToNewCell = m_hasPreviousCell && (cellX != m_previousCellX or cellY != m_previousCellY);
 
 	if (m_levelManager.GetCell(cellX, cellY) == LevelObjectType::emerald)
 	{

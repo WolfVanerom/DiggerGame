@@ -117,7 +117,7 @@ namespace dae
 				std::unique_lock lock(m_queueMutex);
 				m_queueCv.wait(lock, [this]
 				{
-					return !m_running || !m_pendingEvents.empty();
+					return !m_running or !m_pendingEvents.empty();
 				});
 
 				if (!m_running && m_pendingEvents.empty())

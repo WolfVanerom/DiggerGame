@@ -11,6 +11,7 @@ namespace dae
 		GameObject* m_parent{};
 	public:
 		Component(GameObject* parent);
+		dae::GameObject* GetParent();
 		virtual void Update(float deltaTime);
 		virtual void FixedUpdate();
 		virtual void Render() const;

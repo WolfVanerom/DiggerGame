@@ -21,6 +21,7 @@ namespace dae {
 		GoldComponent& operator=(GoldComponent&& other) = delete;
 		void Update(float deltaTime) override;
 		void SetState(GoldState* state) {m_pCurrentState = state; }
+		bool HasBroken() const { return m_Broken; }
 	protected:
 		bool m_HasFallen{ false };
 		bool m_Broken{ false };

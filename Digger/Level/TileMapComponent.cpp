@@ -10,12 +10,12 @@ namespace dae
 {
 	static bool IsHorizontalConnector(const LevelObjectType type)
 	{
-		return type == LevelObjectType::horizontalTunnel || type == LevelObjectType::tunnelEnd;
+		return type == LevelObjectType::horizontalTunnel or type == LevelObjectType::tunnelEnd;
 	}
 
 	static bool IsVerticalConnector(const LevelObjectType type)
 	{
-		return type == LevelObjectType::verticalTunnel || type == LevelObjectType::tunnelEnd;
+		return type == LevelObjectType::verticalTunnel or type == LevelObjectType::tunnelEnd;
 	}
 
 	TileMapComponent::TileMapComponent(GameObject* pOwner, float tileWidth, float tileHeight)
@@ -28,7 +28,7 @@ namespace dae
 	void TileMapComponent::RenderTiledTexture(const Texture2D& texture, float x, float y, float width, float height, bool tileHorizontally) const
 	{
 		const glm::vec2 textureSize = texture.GetSize();
-		if (textureSize.x <= 0.f || textureSize.y <= 0.f)
+		if (textureSize.x <= 0.f or textureSize.y <= 0.f)
 		{
 			return;
 		}
@@ -53,13 +53,13 @@ namespace dae
 	void TileMapComponent::RenderTunnelPreview() const
 	{
 		const auto& preview = LevelManager::GetInstance().GetTunnelPreview();
-		if (!preview.active || preview.type == LevelObjectType::none || preview.progress <= 0.f)
+		if (!preview.active or preview.type == LevelObjectType::none or preview.progress <= 0.f)
 		{
 			return;
 		}
 
 		auto textureIt = m_tileTextures.find(preview.type);
-		if (textureIt == m_tileTextures.end() || textureIt->second == nullptr)
+		if (textureIt == m_tileTextures.end() or textureIt->second == nullptr)
 		{
 			return;
 		}
@@ -109,18 +109,18 @@ namespace dae
 
 	LevelObjectType TileMapComponent::GetConnectedTunnelType(size_t x, size_t y) const
 	{
-		if (m_tiles == nullptr || y >= m_tiles->size() || x >= m_tiles->at(y).size() || m_tiles->at(y).at(x) != LevelObjectType::tunnelEnd)
+		if (m_tiles == nullptr or y >= m_tiles->size() or x >= m_tiles->at(y).size() or m_tiles->at(y).at(x) != LevelObjectType::tunnelEnd)
 		{
 			return LevelObjectType::none;
 		}
 
-        const bool hasHorizontalConnection = (x > 0 && IsHorizontalConnector(m_tiles->at(y).at(x - 1))) || (x + 1 < m_tiles->at(y).size() && IsHorizontalConnector(m_tiles->at(y).at(x + 1)));
+        const bool hasHorizontalConnection = (x > 0 && IsHorizontalConnector(m_tiles->at(y).at(x - 1))) or (x + 1 < m_tiles->at(y).size() && IsHorizontalConnector(m_tiles->at(y).at(x + 1)));
 		if (hasHorizontalConnection)
 		{
 			return LevelObjectType::horizontalTunnel;
 		}
 
-       const bool hasVerticalConnection = (y > 0 && x < m_tiles->at(y - 1).size() && IsVerticalConnector(m_tiles->at(y - 1).at(x))) || (y + 1 < m_tiles->size() && x < m_tiles->at(y + 1).size() && IsVerticalConnector(m_tiles->at(y + 1).at(x)));
+       const bool hasVerticalConnection = (y > 0 && x < m_tiles->at(y - 1).size() && IsVerticalConnector(m_tiles->at(y - 1).at(x))) or (y + 1 < m_tiles->size() && x < m_tiles->at(y + 1).size() && IsVerticalConnector(m_tiles->at(y + 1).at(x)));
 		if (hasVerticalConnection)
 		{
 			return LevelObjectType::verticalTunnel;
@@ -159,13 +159,13 @@ namespace dae
             for (size_t x{}; x < m_tiles->at(y).size(); ++x)
 			{
                 const auto type = m_tiles->at(y).at(x);
-				if (type == LevelObjectType::empty || type == LevelObjectType::none)
+				if (type == LevelObjectType::empty or type == LevelObjectType::none)
 				{
 					continue;
 				}
 
 				auto textureIt = m_tileTextures.find(type);
-				if (textureIt == m_tileTextures.end() || textureIt->second == nullptr)
+				if (textureIt == m_tileTextures.end() or textureIt->second == nullptr)
 				{
 					continue;
 				}
@@ -173,7 +173,7 @@ namespace dae
 				const float drawX = origin.x + static_cast<float>(x) * m_tileWidth;
 				const float drawY = origin.y + static_cast<float>(y) * m_tileHeight;
 
-				if (type == LevelObjectType::horizontalTunnel || type == LevelObjectType::verticalTunnel)
+				if (type == LevelObjectType::horizontalTunnel or type == LevelObjectType::verticalTunnel)
 				{
 					RenderTiledTexture(*textureIt->second, drawX, drawY, m_tileWidth, m_tileHeight, type == LevelObjectType::horizontalTunnel);
 					continue;

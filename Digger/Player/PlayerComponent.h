@@ -39,7 +39,7 @@ namespace dae
 
 		bool CanMoveInDirection(TunnelDirection direction) const
 		{
-			return m_lockedMovementDirection == TunnelDirection::none || m_lockedMovementDirection == direction;
+			return m_lockedMovementDirection == TunnelDirection::none or m_lockedMovementDirection == direction;
 		}
 		void SetLockedMovementDirection(TunnelDirection direction) {
 			if (m_isInTunnel == false)

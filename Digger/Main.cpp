@@ -25,6 +25,9 @@
 #include "DeathComponent.h"
 #include "SdlSoundSystem.h"
 #include "ServiceLocator.h"
+#include "Enemy/EnemySpawnManager.h"
+#include "Enemy/EnemySpawnUpdateComponent.h"
+
 namespace fs = std::filesystem;
 
 
@@ -89,6 +92,14 @@ static void load() {
 	playerComponentPtr->AddObserver(lifeComponentPtr);
 	playerComponentPtr->AddObserver(deathComponentPtr);
 	scene.Add(std::move(go));
+
+	go = std::make_unique<dae::GameObject>();
+	auto enemySpawnManager = &dae::EnemySpawnManager::GetInstance();
+	enemySpawnManager->Init(&scene, playerComponentPtr);
+	auto enemySpawnUpdateComponent = std::make_unique<dae::EnemySpawnUpdateComponent>(go.get());
+	go->addComponent(std::move(enemySpawnUpdateComponent));
+	scene.Add(std::move(go));
+
 
 	//player 2
 

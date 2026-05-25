@@ -41,6 +41,7 @@ namespace dae
 		void UpdateWorldPosition();
 		void SetPositionDirty();
 		void SetPosition(float x, float y, float z = 0);
+		void SetPosition(const glm::vec3& pos);
 
 		bool m_markedForDeletion{ false };
 

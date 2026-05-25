@@ -67,7 +67,7 @@ void dae::GameObject::hasComponentBeenAdded(dae::Component* component) const
 
 void dae::GameObject::SetParent(GameObject* parent, bool keepWorldPosition)
 {
-	if (IsChild(parent) || parent == this || m_parent == parent) {
+	if (IsChild(parent) or parent == this or m_parent == parent) {
 		return;
 	}
 	if (parent == nullptr) {
@@ -91,7 +91,7 @@ void dae::GameObject::SetParent(GameObject* parent, bool keepWorldPosition)
 
 void dae::GameObject::AddChild(GameObject* child)
 {
-	if (child == nullptr || IsChild(child) || child == this) {
+	if (child == nullptr or IsChild(child) or child == this) {
 		return;
 	}
 	child->SetParent(this, true);
@@ -106,6 +106,11 @@ void dae::GameObject::RemoveChild(GameObject* child)
 void dae::GameObject::SetPosition(float x, float y, float z)
 {
 	SetLocalPosition(glm::vec3(x, y, z));
+}
+
+void dae::GameObject::SetPosition(const glm::vec3& pos)
+{
+	SetLocalPosition(pos);
 }
 
 dae::GameObject::~GameObject()
@@ -166,7 +171,7 @@ bool dae::GameObject::IsChild(const GameObject* potentialChild) const
 {
 	for (const auto& child : m_children)
 	{
-		if (child == potentialChild || child->IsChild(potentialChild))
+		if (child == potentialChild or child->IsChild(potentialChild))
 		{
 			return true;
 		}

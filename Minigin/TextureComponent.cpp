@@ -18,7 +18,7 @@ void dae::TextureComponent::Render() const
 	}
 
 	const auto& pos = m_parent->GetWorldPosition();
-	if (!m_isTiled || m_tileArea.x <= 0.f || m_tileArea.y <= 0.f)
+	if (!m_isTiled or m_tileArea.x <= 0.f or m_tileArea.y <= 0.f)
 	{
 		if (m_drawSize.x > 0.f && m_drawSize.y > 0.f)
 		{
@@ -32,7 +32,7 @@ void dae::TextureComponent::Render() const
 	}
 
 	const glm::vec2 textureSize = m_texture->GetSize();
-	if (textureSize.x <= 0.f || textureSize.y <= 0.f)
+	if (textureSize.x <= 0.f or textureSize.y <= 0.f)
 	{
 		return;
 	}

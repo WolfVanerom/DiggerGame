@@ -26,7 +26,7 @@ namespace dae {
 		
 		auto cellBelow = m_pGoldComponent->m_levelManager.GetCell(cellX, cellY + 1);
 		
-		if (cellBelow == LevelObjectType::horizontalTunnel || cellBelow == LevelObjectType::tunnelEnd || cellBelow == LevelObjectType::verticalTunnel)
+		if (cellBelow == LevelObjectType::horizontalTunnel or cellBelow == LevelObjectType::tunnelEnd or cellBelow == LevelObjectType::verticalTunnel)
 		{
 			m_pGoldComponent->m_pCurrentState = m_pGoldComponent->m_pFallingState;
 			m_pGoldComponent->m_pCurrentState->OnEnter();
@@ -79,7 +79,7 @@ namespace dae {
 		int cellX = static_cast<int>(std::round(m_pGoldComponent->m_parent->GetWorldPosition().x / LevelManager::m_tileWidth));
 		int cellY = static_cast<int>(std::round(m_pGoldComponent->m_parent->GetWorldPosition().y / LevelManager::m_tileHeight));
 
-		m_pGoldComponent->m_levelManager.MoveEntityCell(m_pGoldComponent->m_originalCellX, m_pGoldComponent->m_originalCellY, cellX, cellY, LevelObjectType::bag);
+		m_pGoldComponent->m_levelManager.MoveEntityCell(m_pGoldComponent->m_originalCellX, m_pGoldComponent->m_originalCellY, cellX, cellY, LevelObjectType::bag, false);
 		m_pGoldComponent->m_parent->SetPosition(cellX * LevelManager::m_tileWidth, cellY * LevelManager::m_tileHeight);
 	}
 	void BrokenState::OnExit()

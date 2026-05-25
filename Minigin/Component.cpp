@@ -5,6 +5,10 @@ dae::Component::Component(GameObject* parent) : m_parent(parent) {
 
 }
 
+dae::GameObject* dae::Component::GetParent() {
+	return m_parent;
+}
+
 void dae::Component::Update(float) {}
 
 void dae::Component::FixedUpdate() {}
