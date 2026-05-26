@@ -101,7 +101,7 @@ void dae::PlayerComponent::Update(float deltaTime)
 
 		m_levelManager.CheckIfLevelCompleted();
 	}
-	else if(m_levelManager.GetCell(cellX, cellY) == LevelObjectType::bag)
+	else if(m_levelManager.GetCell(cellX, cellY) == LevelObjectType::bag and m_goldBagPickup)
 	{
 		//SDL_Log("Gold collected at cell (%d, %d)", cellX, cellY);
 		m_score += 250;
@@ -122,7 +122,7 @@ void dae::PlayerComponent::Update(float deltaTime)
 		m_previousWorldY = worldY;
 		m_previousMovementDirection = movementDirection;
 		m_lockedMovementDirection = movementDirection;
-		m_levelManager.ClearTunnelPreview();
+		m_levelManager.ClearTunnelPreview(m_parent);
 		return;
 	}
 
@@ -157,7 +157,7 @@ void dae::PlayerComponent::Update(float deltaTime)
 		}
 
 
-		m_levelManager.SetTunnelPreview(cellX, cellY, trailType, movementDirection, m_tunnelProgress);
+		m_levelManager.SetTunnelPreview(m_parent, cellX, cellY, trailType, movementDirection, m_tunnelProgress);
 
 		//SDL_Log("Tunnel progress: %f", m_tunnelProgress);
 
@@ -176,7 +176,9 @@ void dae::PlayerComponent::Update(float deltaTime)
 	}
 	else
 	{
-		m_levelManager.ClearTunnelPreview();
+		m_levelManager.ClearTunnelPreview(m_parent);
+		m_isInTunnel = false;
+		m_tunnelProgress = 0.f;
 	}
 
 	const auto& finalWorldPos = m_parent->GetWorldPosition();
@@ -195,4 +197,17 @@ void dae::PlayerComponent::SubtractHealth(int amount)
 	{
 		Notify(Event::PlayerDied, m_parent);
 	}
+}
+
+bool dae::PlayerComponent::IsPlayerInCell(int cellX, int cellY) const
+{
+	const auto& worldPos = m_parent->GetWorldPosition();
+	const int playerCellX = static_cast<int>(worldPos.x / LevelManager::m_tileWidth);
+	const int playerCellY = static_cast<int>(worldPos.y / LevelManager::m_tileHeight);
+	return playerCellX == cellX && playerCellY == cellY;
+}
+
+void dae::PlayerComponent::SwitchGoldBagPickup()
+{
+	m_goldBagPickup = !m_goldBagPickup;
 }

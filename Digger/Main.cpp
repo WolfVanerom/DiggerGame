@@ -27,6 +27,7 @@
 #include "ServiceLocator.h"
 #include "Enemy/EnemySpawnManager.h"
 #include "Enemy/EnemySpawnUpdateComponent.h"
+#include "Player/PlayerAccessor.h"
 
 namespace fs = std::filesystem;
 
@@ -100,6 +101,8 @@ static void load() {
 	go->addComponent(std::move(enemySpawnUpdateComponent));
 	scene.Add(std::move(go));
 
+	auto playerAccessor = &dae::PlayerAccessor::GetInstance();
+	playerAccessor->SetPlayer(playerComponentPtr);
 
 	//player 2
 

@@ -17,9 +17,13 @@ namespace dae {
 
 	class IdleState final : public GoldState
 	{
+	protected:
+		TextureComponent* m_pTextureComponent{ nullptr };
+	public:
 		void OnEnter() override;
 		void OnExit() override;
 		void Update(float deltaTime) override;
+		void SetTextureComponent(TextureComponent* textureComponent);
 	};
 
 	class FallingState final : public GoldState

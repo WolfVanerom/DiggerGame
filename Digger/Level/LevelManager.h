@@ -4,6 +4,7 @@
 #include <string_view>
 #include <vector>
 #include <optional>
+#include <map>
 
 namespace dae
 {
@@ -48,7 +49,7 @@ namespace dae
 		GameObject* m_currentBackgroundObject{ nullptr };
 		std::vector<std::vector<GameObject*>> m_EntityObjects{};
 		std::vector<std::vector<LevelObjectType>> m_tileObjects{};
-		TunnelPreview m_tunnelPreview{};
+		std::map<GameObject*, TunnelPreview> m_tunnelPreviews{};
 
 		std::vector<std::string> m_currentLevel;
 		Scene* m_currentScene{ nullptr };
@@ -83,8 +84,8 @@ namespace dae
 		LevelObjectType GetCell(int x, int y) const;
 		void SetCell(int x, int y, LevelObjectType type);
 		void MoveEntityCell(int fromX, int fromY, int toX, int toY, LevelObjectType newType, bool moveTexture);
-		void SetTunnelPreview(int cellX, int cellY, LevelObjectType type, TunnelDirection direction, float progress);
-		void ClearTunnelPreview();
-		const TunnelPreview& GetTunnelPreview() const { return m_tunnelPreview; }
+		void SetTunnelPreview(GameObject* player, int cellX, int cellY, LevelObjectType type, TunnelDirection direction, float progress);
+		void ClearTunnelPreview(GameObject* player);
+		std::vector<TunnelPreview> GetAllTunnelPreviews() const;
 	};
 }

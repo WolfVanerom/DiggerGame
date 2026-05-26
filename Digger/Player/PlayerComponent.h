@@ -9,6 +9,7 @@ namespace dae
 
 	class PlayerComponent final : public Component, public subject
 	{
+	private:
 		int m_health{ 5 };
 		int m_score{ 0 };
 		int m_previousCellX{ -1 };
@@ -18,6 +19,7 @@ namespace dae
 		float m_tunnelProgress{ 0.f };
 		bool m_isInTunnel{ false };
 		bool m_hasPreviousCell{ false };
+		bool m_goldBagPickup{ false };
 		TunnelDirection m_previousMovementDirection{ TunnelDirection::none };
 		TunnelDirection m_lockedMovementDirection{ TunnelDirection::none };
 
@@ -31,9 +33,14 @@ namespace dae
 		PlayerComponent& operator=(PlayerComponent&& other) = delete;
 
 		void Update(float deltaTime) override;
+
+		void SwitchGoldBagPickup();
+
 		void SubtractHealth(int amount);
 		int GetHealth() const { return m_health; }
 		int GetScore() const { return m_score; }
+
+		bool IsPlayerInCell(int cellX, int cellY) const;
 
 		TunnelDirection GetLockedMovementDirection() const { return m_lockedMovementDirection; }
 

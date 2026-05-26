@@ -24,7 +24,7 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   Level/GoldState.cpp
   Enemy/EnemySpawnManager.cpp
   Enemy/EnemyComponent.cpp
-  Enemy/EnemyState.cpp "Enemy/EnemySpawnUpdateComponent.cpp" "Player/ProjectileComponent.cpp")
+  Enemy/EnemyState.cpp "Enemy/EnemySpawnUpdateComponent.cpp" "Player/ProjectileComponent.cpp" "Player/PlayerAccessor.cpp")
 
 target_compile_features(${TARGET_NAME} PUBLIC cxx_std_20)
 

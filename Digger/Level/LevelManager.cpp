@@ -284,7 +284,7 @@ void dae::LevelManager::ClearLevel()
 		}
 	}
 	m_EntityObjects.clear();
-	m_tunnelPreview = {};
+	m_tunnelPreviews.clear();
 }
 
 dae::LevelObjectType dae::LevelManager::GetCell(int x, int y) const
@@ -356,25 +356,42 @@ void dae::LevelManager::MoveEntityCell(int fromX, int fromY, int toX, int toY, L
 	}
 }
 
-void dae::LevelManager::SetTunnelPreview(int cellX, int cellY, LevelObjectType type, TunnelDirection direction, float progress)
+void dae::LevelManager::SetTunnelPreview(GameObject* player, int cellX, int cellY, LevelObjectType type, TunnelDirection direction, float progress)
 {
-	if (!IsInBounds(cellX, cellY) or m_currentLevel.empty())
+	if (player == nullptr or !IsInBounds(cellX, cellY) or m_currentLevel.empty())
 	{
-		m_tunnelPreview = {};
+		m_tunnelPreviews.erase(player);
 		return;
 	}
 
-	m_tunnelPreview.active = true;
-	m_tunnelPreview.cellX = cellX;
-	m_tunnelPreview.cellY = cellY;
-	m_tunnelPreview.type = type;
-	m_tunnelPreview.direction = direction;
-	m_tunnelPreview.progress = std::clamp(progress, 0.f, 1.f);
+	auto& preview = m_tunnelPreviews[player];
+	preview.active = true;
+	preview.cellX = cellX;
+	preview.cellY = cellY;
+	preview.type = type;
+	preview.direction = direction;
+	preview.progress = std::clamp(progress, 0.f, 1.f);
 }
 
-void dae::LevelManager::ClearTunnelPreview()
+void dae::LevelManager::ClearTunnelPreview(GameObject* player)
 {
-	m_tunnelPreview = {};
+	if (player != nullptr)
+	{
+		m_tunnelPreviews.erase(player);
+	}
+}
+
+std::vector<dae::TunnelPreview> dae::LevelManager::GetAllTunnelPreviews() const
+{
+	std::vector<TunnelPreview> previews;
+	for (const auto& [player, preview] : m_tunnelPreviews)
+	{
+		if (preview.active && preview.type != LevelObjectType::none && preview.progress > 0.f)
+		{
+			previews.push_back(preview);
+		}
+	}
+	return previews;
 }
 
 void dae::LevelManager::QueueLevelLoad(const std::string& levelFile, Scene* scene)

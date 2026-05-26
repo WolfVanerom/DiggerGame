@@ -4,6 +4,7 @@
 #include "GameObject.h"
 #include "TextureComponent.h"
 #include <SDL3/SDL_log.h>
+#include <PlayerComponent.h>
 
 namespace dae {
 	void IdleState::OnEnter()
@@ -31,6 +32,33 @@ namespace dae {
 			m_pGoldComponent->m_pCurrentState = m_pGoldComponent->m_pFallingState;
 			m_pGoldComponent->m_pCurrentState->OnEnter();
 		}
+
+		auto player = m_pGoldComponent->m_playerAccessor.GetPlayer();
+		TunnelDirection playerDirection = player->GetLockedMovementDirection();
+
+		SDL_Log("Player direction: %d", static_cast<int>(playerDirection));
+
+		switch (playerDirection)
+		{
+		case TunnelDirection::left:
+			if (player->IsPlayerInCell(cellX + 1, cellY)) {
+				auto newX = player->GetParent()->GetWorldPosition().x - m_pTextureComponent->GetWidth();
+				m_pGoldComponent->m_parent->SetPosition(newX, m_pGoldComponent->m_parent->GetWorldPosition().y);
+			}
+			break;
+		case TunnelDirection::right:
+			if (player->IsPlayerInCell(cellX - 1, cellY)) {
+				auto newX = m_pGoldComponent->m_parent->GetWorldPosition().x + m_pTextureComponent->GetWidth();
+				m_pGoldComponent->m_parent->SetPosition(newX, m_pGoldComponent->m_parent->GetWorldPosition().y);
+			}
+			break;
+		default:
+			break;
+		}
+	}
+	void IdleState::SetTextureComponent(TextureComponent* textureComponent)
+	{
+		m_pTextureComponent = textureComponent;
 	}
 	void FallingState::OnEnter()
 	{
@@ -81,6 +109,9 @@ namespace dae {
 
 		m_pGoldComponent->m_levelManager.MoveEntityCell(m_pGoldComponent->m_originalCellX, m_pGoldComponent->m_originalCellY, cellX, cellY, LevelObjectType::bag, false);
 		m_pGoldComponent->m_parent->SetPosition(cellX * LevelManager::m_tileWidth, cellY * LevelManager::m_tileHeight);
+
+		auto player = m_pGoldComponent->m_playerAccessor.GetPlayer();
+		player->SwitchGoldBagPickup();
 	}
 	void BrokenState::OnExit()
 	{

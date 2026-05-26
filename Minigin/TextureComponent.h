@@ -16,6 +16,9 @@ namespace dae
 		void SetTileArea(float width, float height);
 		void SetDrawSize(float width, float height);
 
+		float GetWidth() const { return m_drawSize.x; }
+		float GetHeight() const { return m_drawSize.y; }
+
 		explicit TextureComponent(GameObject* pOwner);
 		virtual ~TextureComponent() = default;
 		TextureComponent(const TextureComponent& other) = delete;

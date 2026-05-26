@@ -52,58 +52,57 @@ namespace dae
 
 	void TileMapComponent::RenderTunnelPreview() const
 	{
-		const auto& preview = LevelManager::GetInstance().GetTunnelPreview();
-		if (!preview.active or preview.type == LevelObjectType::none or preview.progress <= 0.f)
+		const auto previews = LevelManager::GetInstance().GetAllTunnelPreviews();
+		
+		for (const auto& preview : previews)
 		{
-			return;
-		}
-
-		auto textureIt = m_tileTextures.find(preview.type);
-		if (textureIt == m_tileTextures.end() or textureIt->second == nullptr)
-		{
-			return;
-		}
-
-		const float drawX = m_parent->GetWorldPosition().x + static_cast<float>(preview.cellX) * m_tileWidth;
-		const float drawY = m_parent->GetWorldPosition().y + static_cast<float>(preview.cellY) * m_tileHeight;
-		const float clampedProgress = std::clamp(preview.progress, 0.f, 1.f);
-
-		if (preview.type == LevelObjectType::horizontalTunnel)
-		{
-			const float width = m_tileWidth * clampedProgress;
-			if (width <= 0.f)
+			auto textureIt = m_tileTextures.find(preview.type);
+			if (textureIt == m_tileTextures.end() or textureIt->second == nullptr)
 			{
-				return;
+				continue;
 			}
 
-			const glm::vec2 textureSize = textureIt->second->GetSize();
+			const float drawX = m_parent->GetWorldPosition().x + static_cast<float>(preview.cellX) * m_tileWidth;
+			const float drawY = m_parent->GetWorldPosition().y + static_cast<float>(preview.cellY) * m_tileHeight;
+			const float clampedProgress = std::clamp(preview.progress, 0.f, 1.f);
 
-			const float offset = preview.direction == TunnelDirection::left ? m_tileWidth - width : 0.f;
-			for (float xOffset = 0.f; xOffset < width; xOffset += textureSize.x)
+			if (preview.type == LevelObjectType::horizontalTunnel)
 			{
-				const float drawWidth = std::min(textureSize.x, width - xOffset);
-				Renderer::GetInstance().RenderTexture(*textureIt->second, drawX + offset + xOffset, drawY, drawWidth, m_tileHeight, 0.f, 0.f, drawWidth, textureSize.y);
-			}
-			return;
-		}
+				const float width = m_tileWidth * clampedProgress;
+				if (width <= 0.f)
+				{
+					continue;
+				}
 
-		if (preview.type == LevelObjectType::verticalTunnel)
-		{
-			const float height = m_tileHeight * clampedProgress;
-			if (height <= 0.f)
+				const glm::vec2 textureSize = textureIt->second->GetSize();
+
+				const float offset = preview.direction == TunnelDirection::left ? m_tileWidth - width : 0.f;
+				for (float xOffset = 0.f; xOffset < width; xOffset += textureSize.x)
+				{
+					const float drawWidth = std::min(textureSize.x, width - xOffset);
+					Renderer::GetInstance().RenderTexture(*textureIt->second, drawX + offset + xOffset, drawY, drawWidth, m_tileHeight, 0.f, 0.f, drawWidth, textureSize.y);
+				}
+				continue;
+			}
+
+			if (preview.type == LevelObjectType::verticalTunnel)
 			{
-				return;
-			}
+				const float height = m_tileHeight * clampedProgress;
+				if (height <= 0.f)
+				{
+					continue;
+				}
 
-			const glm::vec2 textureSize = textureIt->second->GetSize();
+				const glm::vec2 textureSize = textureIt->second->GetSize();
 
-			const float offset = preview.direction == TunnelDirection::up ? m_tileHeight - height : 0.f;
-			for (float yOffset = 0.f; yOffset < height; yOffset += textureSize.y)
-			{
-				const float drawHeight = std::min(textureSize.y, height - yOffset);
-				Renderer::GetInstance().RenderTexture(*textureIt->second, drawX, drawY + offset + yOffset, m_tileWidth, drawHeight, 0.f, 0.f, textureSize.x, drawHeight);
+				const float offset = preview.direction == TunnelDirection::up ? m_tileHeight - height : 0.f;
+				for (float yOffset = 0.f; yOffset < height; yOffset += textureSize.y)
+				{
+					const float drawHeight = std::min(textureSize.y, height - yOffset);
+					Renderer::GetInstance().RenderTexture(*textureIt->second, drawX, drawY + offset + yOffset, m_tileWidth, drawHeight, 0.f, 0.f, textureSize.x, drawHeight);
+				}
+				continue;
 			}
-			return;
 		}
 	}
 

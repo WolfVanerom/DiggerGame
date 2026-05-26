@@ -1,6 +1,7 @@
 #pragma once
 #include "Component.h"
 #include "LevelManager.h"
+#include "PlayerAccessor.h"
 
 namespace dae {
 	class GameObject;
@@ -28,6 +29,7 @@ namespace dae {
 		int m_originalCellX{ -1 };
 		int m_originalCellY{ -1 };
 		LevelManager& m_levelManager{ LevelManager::GetInstance() };
+		PlayerAccessor& m_playerAccessor{ PlayerAccessor::GetInstance() };
 		GoldState* m_pCurrentState{ nullptr };
 		IdleState* m_pIdleState{ nullptr };
 		FallingState* m_pFallingState{ nullptr };
