@@ -2,6 +2,7 @@
 #include "Renderer.h"
 #include <algorithm>
 #include "ServiceLocator.h"
+#include "GoldComponent.h"
 
 using dae::TunnelDirection;
 using dae::LevelObjectType;
@@ -101,8 +102,20 @@ void dae::PlayerComponent::Update(float deltaTime)
 
 		m_levelManager.CheckIfLevelCompleted();
 	}
-	else if(m_levelManager.GetCell(cellX, cellY) == LevelObjectType::bag and m_goldBagPickup)
+	else if(m_levelManager.GetCell(cellX, cellY) == LevelObjectType::bag)
 	{
+		auto* object = m_levelManager.GetEntityObjectFromCell(cellX, cellY);
+		if (object == nullptr)
+		{
+			return;
+		}
+
+		GoldComponent& goldComponent = static_cast<GoldComponent&>(*object->getComponent(typeid(GoldComponent)));
+		if(goldComponent.HasBroken() == false)
+		{
+			return;
+		}
+
 		//SDL_Log("Gold collected at cell (%d, %d)", cellX, cellY);
 		m_score += 250;
 		m_levelManager.SetCell(cellX, cellY, LevelObjectType::empty);
@@ -205,9 +218,4 @@ bool dae::PlayerComponent::IsPlayerInCell(int cellX, int cellY) const
 	const int playerCellX = static_cast<int>(worldPos.x / LevelManager::m_tileWidth);
 	const int playerCellY = static_cast<int>(worldPos.y / LevelManager::m_tileHeight);
 	return playerCellX == cellX && playerCellY == cellY;
-}
-
-void dae::PlayerComponent::SwitchGoldBagPickup()
-{
-	m_goldBagPickup = !m_goldBagPickup;
 }

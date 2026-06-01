@@ -5,6 +5,7 @@
 #include "TextureComponent.h"
 #include <SDL3/SDL_log.h>
 #include <PlayerComponent.h>
+#include <vector>
 
 namespace dae {
 	void IdleState::OnEnter()
@@ -21,9 +22,11 @@ namespace dae {
 	{
 	}
 	void IdleState::Update(float)
-	{	
+	{ 	
 		int cellX = static_cast<int>(std::round(m_pGoldComponent->m_parent->GetWorldPosition().x / LevelManager::m_tileWidth));
 		int cellY = static_cast<int>(std::round(m_pGoldComponent->m_parent->GetWorldPosition().y / LevelManager::m_tileHeight));
+		int targetCellX = cellX;
+		int targetCellY = cellY;
 		
 		auto cellBelow = m_pGoldComponent->m_levelManager.GetCell(cellX, cellY + 1);
 		
@@ -33,27 +36,46 @@ namespace dae {
 			m_pGoldComponent->m_pCurrentState->OnEnter();
 		}
 
-		auto player = m_pGoldComponent->m_playerAccessor.GetPlayer();
-		TunnelDirection playerDirection = player->GetLockedMovementDirection();
+		auto players = m_pGoldComponent->m_playerAccessor.GetPlayers();
+		for (auto player : players) {
+			TunnelDirection playerDirection = player->GetLockedMovementDirection();
 
-		SDL_Log("Player direction: %d", static_cast<int>(playerDirection));
+			SDL_Log("Player direction: %d", static_cast<int>(playerDirection));
 
-		switch (playerDirection)
+			auto playerXPos = player->GetParent()->GetWorldPosition().x;
+			auto goldXPos = m_pGoldComponent->m_parent->GetWorldPosition().x;
+			auto goldYPos = m_pGoldComponent->m_parent->GetWorldPosition().y;
+			const float pushStep = m_pTextureComponent->GetWidth() * 0.1f;
+			const float rightDistance = std::abs(playerXPos - goldXPos);
+
+			switch (playerDirection)
+			{
+			case TunnelDirection::left:
+			{
+				const float leftDistance = std::abs(playerXPos - (goldXPos + m_pTextureComponent->GetWidth()));
+				if (std::round(player->IsPlayerInCell(cellX, cellY)) and leftDistance < m_pTextureComponent->GetWidth()) {
+					m_pGoldComponent->m_parent->SetPosition(goldXPos - pushStep, goldYPos);
+				}
+				break;
+			}
+			case TunnelDirection::right:
+				if (std::round(player->IsPlayerInCell(cellX - 1, cellY)) and rightDistance < m_pTextureComponent->GetWidth()) {
+					m_pGoldComponent->m_parent->SetPosition(goldXPos + pushStep, goldYPos);
+				}
+				break;
+			default:
+				break;
+			}
+		}
+
+		const int newCellX = static_cast<int>(std::round(m_pGoldComponent->m_parent->GetWorldPosition().x / LevelManager::m_tileWidth));
+		const int newCellY = static_cast<int>(std::round(m_pGoldComponent->m_parent->GetWorldPosition().y / LevelManager::m_tileHeight));
+		if (newCellX != m_pGoldComponent->m_originalCellX || newCellY != m_pGoldComponent->m_originalCellY)
 		{
-		case TunnelDirection::left:
-			if (player->IsPlayerInCell(cellX + 1, cellY)) {
-				auto newX = player->GetParent()->GetWorldPosition().x - m_pTextureComponent->GetWidth();
-				m_pGoldComponent->m_parent->SetPosition(newX, m_pGoldComponent->m_parent->GetWorldPosition().y);
-			}
-			break;
-		case TunnelDirection::right:
-			if (player->IsPlayerInCell(cellX - 1, cellY)) {
-				auto newX = m_pGoldComponent->m_parent->GetWorldPosition().x + m_pTextureComponent->GetWidth();
-				m_pGoldComponent->m_parent->SetPosition(newX, m_pGoldComponent->m_parent->GetWorldPosition().y);
-			}
-			break;
-		default:
-			break;
+			m_pGoldComponent->m_levelManager.MoveEntityCell(m_pGoldComponent->m_originalCellX, m_pGoldComponent->m_originalCellY, newCellX, newCellY, LevelObjectType::bag, false);
+
+			m_pGoldComponent->m_originalCellX = newCellX;
+			m_pGoldComponent->m_originalCellY = newCellY;
 		}
 	}
 	void IdleState::SetTextureComponent(TextureComponent* textureComponent)
@@ -68,7 +90,7 @@ namespace dae {
 	{
 	}
 	void FallingState::Update(float)
-	{	
+	{ 	
 		int cellX = static_cast<int>(std::round(m_pGoldComponent->m_parent->GetWorldPosition().x / LevelManager::m_tileWidth));
 		int cellY = static_cast<int>(std::round(m_pGoldComponent->m_parent->GetWorldPosition().y / LevelManager::m_tileHeight));
 		int cellYBelow = cellY + 1;
@@ -108,10 +130,9 @@ namespace dae {
 		int cellY = static_cast<int>(std::round(m_pGoldComponent->m_parent->GetWorldPosition().y / LevelManager::m_tileHeight));
 
 		m_pGoldComponent->m_levelManager.MoveEntityCell(m_pGoldComponent->m_originalCellX, m_pGoldComponent->m_originalCellY, cellX, cellY, LevelObjectType::bag, false);
+		m_pGoldComponent->m_originalCellX = cellX;
+		m_pGoldComponent->m_originalCellY = cellY;
 		m_pGoldComponent->m_parent->SetPosition(cellX * LevelManager::m_tileWidth, cellY * LevelManager::m_tileHeight);
-
-		auto player = m_pGoldComponent->m_playerAccessor.GetPlayer();
-		player->SwitchGoldBagPickup();
 	}
 	void BrokenState::OnExit()
 	{

@@ -297,6 +297,19 @@ dae::LevelObjectType dae::LevelManager::GetCell(int x, int y) const
 	return CharToType(c);
 }
 
+dae::GameObject* dae::LevelManager::GetEntityObjectFromCell(int x, int y) const
+{
+	if (!IsInBounds(x, y) or m_currentLevel.empty())
+	{
+		return nullptr;
+	}
+	if (!m_EntityObjects.empty())
+	{
+		return m_EntityObjects[y][x];
+	}
+	return nullptr;
+}
+
 void dae::LevelManager::SetCell(int x, int y, LevelObjectType type)
 {
 	if (!IsInBounds(x, y) or m_currentLevel.empty())

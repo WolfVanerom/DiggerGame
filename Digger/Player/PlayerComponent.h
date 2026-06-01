@@ -34,8 +34,6 @@ namespace dae
 
 		void Update(float deltaTime) override;
 
-		void SwitchGoldBagPickup();
-
 		void SubtractHealth(int amount);
 		int GetHealth() const { return m_health; }
 		int GetScore() const { return m_score; }

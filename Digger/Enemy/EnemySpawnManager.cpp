@@ -2,7 +2,7 @@
 #include <Scene.h>
 #include <GameObject.h>
 #include "EnemyComponent.h"
-
+#include "LevelManager.h"
 
 namespace dae
 {
@@ -18,24 +18,33 @@ namespace dae
 		if (m_SpawnTimer >= 5.0f)
 		{
 			m_SpawnTimer = 0.0f;
-			EnemyState* newState = nullptr;
-			SpawnEnemy(newState, m_pScene);
+			SpawnEnemy(m_pScene);
 		}
 	}
 
-	void EnemySpawnManager::SpawnEnemy(EnemyState* state, Scene* scene)
+	void EnemySpawnManager::SpawnEnemy(Scene* scene)
 	{
-		if (enemyCount < currentMaxEnemyCount)
+		if (scene == nullptr or enemyCount >= currentMaxEnemyCount)
 		{
-			auto go = std::make_unique<GameObject>();
-			auto textureComponent = std::make_unique<TextureComponent>(go.get());
-			textureComponent->SetTexture("media/cnob1.png");
-			auto enemyComponent = std::make_unique<EnemyComponent>(go.get(), m_pPlayerComponent, textureComponent.get());
-			scene->Add(std::move(go));
-			m_pEnemies.push_back(enemyComponent.get());
-			enemyCount++;
+			return;
 		}
+
+		auto go = std::make_unique<GameObject>();
+		auto textureComponent = std::make_unique<TextureComponent>(go.get());
+		textureComponent->SetTexture("media/cnob1.png");
+		textureComponent->SetDrawSize(LevelManager::m_tileWidth, LevelManager::m_tileHeight);
+		auto enemyComponent = std::make_unique<EnemyComponent>(go.get(), m_pPlayerComponent, textureComponent.get());
+
+		auto* enemyPtr = enemyComponent.get();
+
+		go->addComponent(std::move(textureComponent));
+		go->addComponent(std::move(enemyComponent));
+
+		scene->Add(std::move(go));
+		m_pEnemies.push_back(enemyPtr);
+		enemyCount++;
 	}
+
 	void EnemySpawnManager::RemoveEnemy(EnemyComponent* enemy)
 	{
 		enemy->GetParent()->MarkForDeletion();
@@ -46,6 +55,7 @@ namespace dae
 			enemyCount--;
 		}
 	}
+
 	void EnemySpawnManager::ClearEnemies()
 	{
 		for (auto* enemy : m_pEnemies)
@@ -55,6 +65,7 @@ namespace dae
 		m_pEnemies.clear();
 		enemyCount = 0;
 	}
+
 	void EnemySpawnManager::SpawnBonusCherry()
 	{
 		if (enemyCount == currentMaxEnemyCount)

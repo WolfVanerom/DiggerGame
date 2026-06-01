@@ -1,12 +1,22 @@
 #include "PlayerAccessor.h"
 #include "PlayerComponent.h"
+#include <vector>
 
-dae::PlayerComponent* dae::PlayerAccessor::GetPlayer() const
+dae::PlayerComponent* dae::PlayerAccessor::GetPlayer(size_t index) const
 {
-	return m_pPlayer;
+	if (index >= m_players.size())
+	{
+		return nullptr;
+	}
+	return m_players[index];
 }
 
-void dae::PlayerAccessor::SetPlayer(PlayerComponent* pPlayer)
+std::vector<dae::PlayerComponent*> dae::PlayerAccessor::GetPlayers() const
 {
-	m_pPlayer = pPlayer;
+	return m_players;
+}
+
+void dae::PlayerAccessor::AddPlayer(PlayerComponent* pPlayer)
+{
+	m_players.push_back(pPlayer);
 }

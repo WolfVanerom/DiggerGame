@@ -94,15 +94,8 @@ static void load() {
 	playerComponentPtr->AddObserver(deathComponentPtr);
 	scene.Add(std::move(go));
 
-	go = std::make_unique<dae::GameObject>();
-	auto enemySpawnManager = &dae::EnemySpawnManager::GetInstance();
-	enemySpawnManager->Init(&scene, playerComponentPtr);
-	auto enemySpawnUpdateComponent = std::make_unique<dae::EnemySpawnUpdateComponent>(go.get());
-	go->addComponent(std::move(enemySpawnUpdateComponent));
-	scene.Add(std::move(go));
-
 	auto playerAccessor = &dae::PlayerAccessor::GetInstance();
-	playerAccessor->SetPlayer(playerComponentPtr);
+	playerAccessor->AddPlayer(playerComponentPtr);
 
 	//player 2
 
@@ -151,6 +144,16 @@ static void load() {
 	playerComponentPtr2->AddObserver(lifeComponentPtr2);
 	playerComponentPtr2->AddObserver(deathComponentPtr2);
 
+	playerAccessor->AddPlayer(playerComponentPtr2);
+
+	scene.Add(std::move(go));
+
+	//enemy spawn manager
+	go = std::make_unique<dae::GameObject>();
+	auto enemySpawnManager = &dae::EnemySpawnManager::GetInstance();
+	enemySpawnManager->Init(&scene, playerComponentPtr);
+	auto enemySpawnUpdateComponent = std::make_unique<dae::EnemySpawnUpdateComponent>(go.get());
+	go->addComponent(std::move(enemySpawnUpdateComponent));
 	scene.Add(std::move(go));
 
 	//fps

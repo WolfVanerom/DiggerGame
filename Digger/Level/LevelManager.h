@@ -82,6 +82,7 @@ namespace dae
 		void LowerEmeraldCount() { m_amountOfEmeralds--;}
 
 		LevelObjectType GetCell(int x, int y) const;
+		GameObject* GetEntityObjectFromCell(int x, int y) const;
 		void SetCell(int x, int y, LevelObjectType type);
 		void MoveEntityCell(int fromX, int fromY, int toX, int toY, LevelObjectType newType, bool moveTexture);
 		void SetTunnelPreview(GameObject* player, int cellX, int cellY, LevelObjectType type, TunnelDirection direction, float progress);

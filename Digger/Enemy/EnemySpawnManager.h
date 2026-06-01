@@ -16,7 +16,7 @@ namespace dae
 
 		void Update(float deltaTime);
 
-		void SpawnEnemy(EnemyState* state, Scene* scene);
+		void SpawnEnemy(Scene* scene);
 		void RemoveEnemy(EnemyComponent* enemy);
 		void ClearEnemies();
 		void SpawnBonusCherry();

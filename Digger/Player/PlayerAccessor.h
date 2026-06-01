@@ -1,5 +1,6 @@
 #pragma once
 #include <Singleton.h>
+#include <vector>
 
 namespace dae
 {
@@ -7,9 +8,10 @@ namespace dae
 	class PlayerAccessor final : public Singleton<PlayerAccessor>
 	{
 	public:
-		PlayerComponent* GetPlayer() const;
-		void SetPlayer(PlayerComponent* pPlayer);
+		PlayerComponent* GetPlayer(size_t index) const;
+		std::vector<PlayerComponent*> GetPlayers() const;
+		void AddPlayer(PlayerComponent* pPlayer);
 	private:
-		PlayerComponent* m_pPlayer{ nullptr };
+		std::vector<PlayerComponent*> m_players;
 	};
 }

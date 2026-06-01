@@ -28,9 +28,9 @@ namespace dae
 		LevelManager& m_levelManager{ LevelManager::GetInstance() };
 		EnemySpawnManager& m_enemySpawnManager{ EnemySpawnManager::GetInstance() };
 		TextureComponent* m_pTextureComponent{ nullptr };
-		EnemyState* m_pCurrentState{ nullptr };
 		NobbinState* m_pNobbinState{ nullptr };
 		HobbinState* m_pHobbinState{ nullptr };
+		EnemyState* m_pCurrentState{ nullptr };
 		glm::vec3 m_Direction{ 0.f, 0.f, 0.f };
 		glm::vec3 m_Position{ 0.f, 0.f, 0.f };
 		glm::vec3 m_PlayerPosition{ 0.f, 0.f, 0.f };
