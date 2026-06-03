@@ -17,8 +17,11 @@ namespace dae
 
 		void SetText(const std::string& text);
 		void SetPosition(float x, float y);
-      void SetScale(float scale);
+		void SetScale(float scale);
 		void SetColor(const SDL_Color& color);
+
+		float GetWidth() const;
+		float GetHeight() const;
 
 		explicit TextComponent(GameObject* pOwner, const std::string& text, Font* font, const SDL_Color& color);
 		virtual ~TextComponent() = default;

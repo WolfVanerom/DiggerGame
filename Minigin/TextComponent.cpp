@@ -68,4 +68,14 @@ void dae::TextComponent::SetColor(const SDL_Color& color)
 	m_needsUpdate = true; 
 }
 
+float dae::TextComponent::GetWidth() const
+{
+	auto textureSize = m_textTexture->GetSize();
+	return textureSize.x * m_scale;
+}
 
+float dae::TextComponent::GetHeight() const
+{
+	auto textureSize = m_textTexture->GetSize();
+	return textureSize.y * m_scale;
+}

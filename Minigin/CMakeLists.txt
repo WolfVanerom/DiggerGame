@@ -13,6 +13,7 @@ set(MINIGIN_SOURCES
   Texture2D.cpp
   TextureComponent.cpp
   Transform.cpp
+  ButtonComponent.cpp
 )
 
 add_library(minigin STATIC ${MINIGIN_SOURCES})

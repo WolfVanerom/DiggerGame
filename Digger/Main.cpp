@@ -28,13 +28,85 @@
 #include "Enemy/EnemySpawnManager.h"
 #include "Enemy/EnemySpawnUpdateComponent.h"
 #include "Player/PlayerAccessor.h"
+#include "MenuComponent.h"
+#include "ButtonComponent.h"
 
 namespace fs = std::filesystem;
 
+auto& menuScene = dae::SceneManager::GetInstance().CreateScene();
+auto& scene = dae::SceneManager::GetInstance().CreateScene();
+
+static void StartGameFromMenu()
+{
+	dae::SceneManager::GetInstance().SetActiveScene(&scene);
+}
+
+static void ExitGameFromMenu()
+{
+	std::exit(0);
+}
 
 static void load() {
-	auto& scene = dae::SceneManager::GetInstance().CreateScene();
+	dae::SceneManager::GetInstance().SetActiveScene(&menuScene);
 	auto levelManager = &dae::LevelManager::GetInstance();
+
+	auto menuGo = std::make_unique<dae::GameObject>();
+
+	auto font = dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", 36);
+	auto menuTextComponent = std::make_unique<dae::TextComponent>(menuGo.get(), "Start Game", font.get(), SDL_Color{ 255, 255, 255, 255 });
+	menuTextComponent->SetPosition(150, 200);
+	auto* startTextComponentPtr = menuTextComponent.get();
+	menuGo->addComponent(std::move(menuTextComponent));
+
+	auto buttonComponent = std::make_unique<dae::ButtonComponent>(menuGo.get(), startTextComponentPtr, StartGameFromMenu);
+	auto* startButtonComponentPtr = buttonComponent.get();
+	menuGo->addComponent(std::move(buttonComponent));
+
+	menuTextComponent = std::make_unique<dae::TextComponent>(menuGo.get(), "Start Co-op", font.get(), SDL_Color{ 255, 255, 255, 255 });
+	menuTextComponent->SetPosition(400, 200);
+	auto* coOpTextComponentPtr = menuTextComponent.get();
+	menuGo->addComponent(std::move(menuTextComponent));
+
+	buttonComponent = std::make_unique<dae::ButtonComponent>(menuGo.get(), coOpTextComponentPtr, StartGameFromMenu);
+	auto* coOpButtonComponentPtr = buttonComponent.get();
+	menuGo->addComponent(std::move(buttonComponent));
+
+	menuTextComponent = std::make_unique<dae::TextComponent>(menuGo.get(), "Start VS", font.get(), SDL_Color{ 255, 255, 255, 255 });
+	menuTextComponent->SetPosition(650, 200);
+	auto* vsTextComponentPtr = menuTextComponent.get();
+	menuGo->addComponent(std::move(menuTextComponent));
+
+	buttonComponent = std::make_unique<dae::ButtonComponent>(menuGo.get(), vsTextComponentPtr, StartGameFromMenu);
+	auto* vsButtonComponentPtr = buttonComponent.get();
+	menuGo->addComponent(std::move(buttonComponent));
+
+	menuTextComponent = std::make_unique<dae::TextComponent>(menuGo.get(), "Exit", font.get(), SDL_Color{ 255, 255, 255, 255 });
+	menuTextComponent->SetPosition(450, 350);
+	auto* exitTextComponentPtr = menuTextComponent.get();
+	menuGo->addComponent(std::move(menuTextComponent));
+
+	buttonComponent = std::make_unique<dae::ButtonComponent>(menuGo.get(), exitTextComponentPtr, ExitGameFromMenu);
+	auto* exitButtonComponentPtr = buttonComponent.get();
+	menuGo->addComponent(std::move(buttonComponent));
+
+	auto menuComponent = std::make_unique<dae::MenuComponent>(menuGo.get(), &menuScene);
+	menuComponent->AddMenuItem(startButtonComponentPtr, 0);
+	menuComponent->AddMenuItem(coOpButtonComponentPtr, 0);
+	menuComponent->AddMenuItem(vsButtonComponentPtr, 0);
+	menuComponent->AddMenuItem(exitButtonComponentPtr, 1);
+
+	menuComponent->SetSelectedItem(startButtonComponentPtr);
+
+	dae::InputManager::GetInstance().AddMenuCommand(SDLK_UP, std::make_unique<dae::MenuMoveCommand>(menuGo.get(), menuComponent.get(), 0.f, -1.f));
+	dae::InputManager::GetInstance().AddMenuCommand(SDLK_DOWN, std::make_unique<dae::MenuMoveCommand>(menuGo.get(), menuComponent.get(), 0.f, 1.f));
+	dae::InputManager::GetInstance().AddMenuCommand(SDLK_LEFT, std::make_unique<dae::MenuMoveCommand>(menuGo.get(), menuComponent.get(), -1.f, 0.f));
+	dae::InputManager::GetInstance().AddMenuCommand(SDLK_RIGHT, std::make_unique<dae::MenuMoveCommand>(menuGo.get(), menuComponent.get(), 1.f, 0.f));
+	dae::InputManager::GetInstance().AddMenuCommand(SDLK_RETURN, std::make_unique<dae::MenuSelectCommand>(menuGo.get(), menuComponent.get()));
+
+	menuGo->addComponent(std::move(menuComponent));
+
+	menuScene.Add(std::move(menuGo));
+
 
     #if __EMSCRIPTEN__
 	levelManager->LoadLevel("levelData/1.txt", &scene);
@@ -48,7 +120,6 @@ static void load() {
 	//player 1
 
 	auto go = std::make_unique<dae::GameObject>();
-	auto font = dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", 36);
 	auto textComponent = std::make_unique<dae::TextComponent>(go.get(), "#Lives = 5", font.get(), SDL_Color{ 255, 255, 255, 255 });
 	textComponent->SetPosition(0, 0);
 	auto* livesTextComponentPtr = textComponent.get();

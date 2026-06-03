@@ -14,12 +14,19 @@ namespace dae
 		Scene& CreateScene();
 
 		void Update(float deltaTime);
+		void UpdateOneScene(float deltaTime);
 		void FixedUpdate();
+		void FixedUpdateOneScene();
 		void Render();
+		void RenderOneScene();
+
+		void SetActiveScene(Scene* pScene);
+
 		void CheckForDeletion();
 	private:
 		friend class Singleton<SceneManager>;
 		SceneManager() = default;
 		std::vector<std::unique_ptr<Scene>> m_scenes{};
+		Scene* m_pActiveScene{ nullptr };
 	};
 }

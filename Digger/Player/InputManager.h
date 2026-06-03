@@ -5,6 +5,7 @@
 #include <cmath>
 #include <memory>
 #include <unordered_map>
+#include <MenuComponent.h>
 
 namespace dae
 {
@@ -108,17 +109,67 @@ namespace dae
 		}
 	};
 
+	class MenuMoveCommand : public GameObjectCommand {
+		MenuComponent* m_pMenuComponent;
+		float m_offsetX;
+		float m_offsetY;
+	public:
+		MenuMoveCommand(dae::GameObject* gameObject, dae::MenuComponent* pMenuComponent, float offsetX, float offsetY)
+			: GameObjectCommand(gameObject), m_pMenuComponent(pMenuComponent), m_offsetX(offsetX), m_offsetY(offsetY) {
+		}
+		void Execute() override {
+			if (m_pMenuComponent != nullptr) {
+				if (m_offsetY < 0.f)
+				{
+					m_pMenuComponent->MoveUp();
+				}
+				else if (m_offsetY > 0.f)
+				{
+					m_pMenuComponent->MoveDown();
+				}
+				else if (m_offsetX < 0.f)
+				{
+					m_pMenuComponent->MoveLeft();
+				}
+				else if (m_offsetX > 0.f)
+				{
+					m_pMenuComponent->MoveRight();
+				}
+			}
+		}
+	};
+
+	class MenuSelectCommand : public GameObjectCommand {
+		MenuComponent* m_pMenuComponent;
+	public:
+		explicit MenuSelectCommand(dae::GameObject* gameObject, dae::MenuComponent* pMenuComponent) : GameObjectCommand(gameObject), m_pMenuComponent(pMenuComponent)
+		{
+		}
+		void Execute() override {
+			if (m_pMenuComponent != nullptr) {
+				m_pMenuComponent->ClickSelectedItem();
+			}
+		}
+	};
+
 	class InputManager final : public Singleton<InputManager>
 	{
 	private:
 		std::unordered_map<int, std::unique_ptr<Command>> m_commands;
+		std::unordered_map<int, std::unique_ptr<Command>> m_menuCommands;
 	public:
 		bool ProcessInput();
 		void AddCommand(int key, std::unique_ptr<Command> command) {
 			m_commands[key] = std::move(command);
 		}
+		void AddMenuCommand(int key, std::unique_ptr<Command> command) {
+			m_menuCommands[key] = std::move(command);
+		}
 		void RemoveCommand(int key) {
 			m_commands.erase(key);
+		}
+		void RemoveMenuCommand(int key) {
+			m_menuCommands.erase(key);
 		}
 		void RemoveCommandsForGameObject(dae::GameObject* gameObject) {
 			for (auto it = m_commands.begin(); it != m_commands.end(); ) {
@@ -131,6 +182,16 @@ namespace dae
 				}
 			}
 		}
+		void RemoveMenuCommandsForGameObject(dae::GameObject* gameObject) {
+			for (auto it = m_menuCommands.begin(); it != m_menuCommands.end(); ) {
+				GameObjectCommand* gameObjectCommand = dynamic_cast<GameObjectCommand*>(it->second.get());
+				if (gameObjectCommand && gameObjectCommand->m_gameObject == gameObject) {
+					it = m_menuCommands.erase(it);
+				}
+				else {
+					++it;
+				}
+			}
+		}
 	};
-
 }

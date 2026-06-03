@@ -78,7 +78,7 @@ dae::Minigin::Minigin(const std::filesystem::path& dataPath)
 	}
 
 	g_window = SDL_CreateWindow(
-		"Programming 4 assignment",
+		"Digger",
 		1024,
 		576,
 		SDL_WINDOW_OPENGL
@@ -131,10 +131,10 @@ void dae::Minigin::RunOneFrame()
 	m_quit = !InputManager::GetInstance().ProcessInput();
 	while (m_accLag >= m_fixedTimeStep)
 	{
-		SceneManager::GetInstance().FixedUpdate();
+		SceneManager::GetInstance().FixedUpdateOneScene();
 		m_accLag -= m_fixedTimeStep;
 	}
-	SceneManager::GetInstance().Update(deltaTime);
+	SceneManager::GetInstance().UpdateOneScene(deltaTime);
 	LevelManager::GetInstance().ProcessPendingLevelLoad();
 	Renderer::GetInstance().Render();
 

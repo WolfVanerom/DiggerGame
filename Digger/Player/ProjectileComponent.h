@@ -8,7 +8,7 @@ namespace dae
 	class ProjectileComponent final : public Component
 	{
 	public:
-		ProjectileComponent(GameObject* pOwner);
+		ProjectileComponent(GameObject* pOwner, TunnelDirection direction);
 		virtual ~ProjectileComponent() = default;
 		ProjectileComponent(const ProjectileComponent& other) = delete;
 		ProjectileComponent(ProjectileComponent&& other) = delete;

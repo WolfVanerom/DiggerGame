@@ -42,7 +42,7 @@ void dae::Renderer::Render() const
 	ImGui_ImplSDL3_NewFrame();
 	ImGui::NewFrame();
 
-	SceneManager::GetInstance().Render();
+	SceneManager::GetInstance().RenderOneScene();
 
 	ImGui::Render();
 

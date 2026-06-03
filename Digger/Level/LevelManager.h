@@ -50,6 +50,7 @@ namespace dae
 		std::vector<std::vector<GameObject*>> m_EntityObjects{};
 		std::vector<std::vector<LevelObjectType>> m_tileObjects{};
 		std::map<GameObject*, TunnelPreview> m_tunnelPreviews{};
+		std::vector<std::vector<GameObject*>> m_projectileObjects{};
 
 		std::vector<std::string> m_currentLevel;
 		Scene* m_currentScene{ nullptr };
@@ -80,6 +81,9 @@ namespace dae
 		void ProcessPendingLevelLoad();
 		void QueueLevelLoad(const std::string& levelFile, Scene* scene);
 		void LowerEmeraldCount() { m_amountOfEmeralds--;}
+
+		void SpawnProjectileAt(int x, int y, TunnelDirection direction);
+		bool HasProjectileAt(int x, int y) const;
 
 		LevelObjectType GetCell(int x, int y) const;
 		GameObject* GetEntityObjectFromCell(int x, int y) const;

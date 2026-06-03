@@ -21,6 +21,8 @@ namespace dae
 		void ClearEnemies();
 		void SpawnBonusCherry();
 
+		void SetMaxEnemyCountForLevel(int level);
+
 		// Added accessor for enemy list
 		const std::vector<EnemyComponent*>& GetEnemies() const { return m_pEnemies; }
 

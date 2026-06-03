@@ -200,6 +200,11 @@ void dae::PlayerComponent::Update(float deltaTime)
 	m_previousMovementDirection = movementDirection;
 }
 
+void dae::PlayerComponent::ShootProjectile(TunnelDirection direction)
+{
+	m_levelManager.SpawnProjectileAt(m_previousCellX, m_previousCellY, direction);
+}
+
 void dae::PlayerComponent::SubtractHealth(int amount)
 {
 	m_health -= amount;

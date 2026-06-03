@@ -4,8 +4,8 @@
 
 namespace dae
 {
-	ProjectileComponent::ProjectileComponent(GameObject* pOwner)
-		: Component(pOwner)
+	ProjectileComponent::ProjectileComponent(GameObject* pOwner, TunnelDirection direction)
+		: Component(pOwner), m_Direction(direction)
 	{
 		m_pLevelManager = &LevelManager::GetInstance();
 		m_MoveOffset = DirectionToMoveOffset(m_Direction);

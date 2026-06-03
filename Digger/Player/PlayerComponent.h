@@ -3,6 +3,7 @@
 #include "Observer.h"
 #include <memory>
 #include "LevelManager.h"
+#include "ProjectileComponent.h"
 
 namespace dae
 {
@@ -24,6 +25,7 @@ namespace dae
 		TunnelDirection m_lockedMovementDirection{ TunnelDirection::none };
 
 		LevelManager& m_levelManager{ LevelManager::GetInstance() };
+		ProjectileComponent* m_pProjectileComponent{ nullptr };
 	public:
 		PlayerComponent(GameObject* pOwner);
 		~PlayerComponent() override;
@@ -33,6 +35,8 @@ namespace dae
 		PlayerComponent& operator=(PlayerComponent&& other) = delete;
 
 		void Update(float deltaTime) override;
+
+		void ShootProjectile(TunnelDirection direction);
 
 		void SubtractHealth(int amount);
 		int GetHealth() const { return m_health; }

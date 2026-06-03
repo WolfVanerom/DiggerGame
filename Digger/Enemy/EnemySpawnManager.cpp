@@ -73,4 +73,9 @@ namespace dae
 			// Spawn bonus cherry logic here
 		}
 	}
+
+	void EnemySpawnManager::SetMaxEnemyCountForLevel(int level)
+	{
+		currentMaxEnemyCount = m_MaxEnemyCountPerLevel[level-1];
+	}
 }

@@ -10,6 +10,8 @@
 #include "EmeraldComponent.h"
 #include "GoldComponent.h"
 #include <SDL3/SDL_log.h>
+#include <ProjectileComponent.h>
+#include <Enemy/EnemySpawnManager.h>
 
 void dae::LevelManager::CreateCurrentNonEntityDrawObject(Scene* scene)
 {
@@ -210,6 +212,8 @@ void dae::LevelManager::LoadLevel(const std::string& levelFile, Scene* scene)
 {
 	m_currentScene = scene;
 
+	EnemySpawnManager::GetInstance().SetMaxEnemyCountForLevel(m_currentLevelIndex);
+
 	m_amountOfEmeralds = -1;
 
 	std::ifstream file(levelFile);
@@ -269,6 +273,8 @@ void dae::LevelManager::ClearLevel()
 {
 	m_currentLevel.clear();
     m_tileObjects.clear();
+	m_projectileObjects.clear();
+	EnemySpawnManager::GetInstance().ClearEnemies();
     if (!m_EntityObjects.empty())
 	{
 		for (auto& row : m_EntityObjects)
@@ -410,6 +416,24 @@ std::vector<dae::TunnelPreview> dae::LevelManager::GetAllTunnelPreviews() const
 void dae::LevelManager::QueueLevelLoad(const std::string& levelFile, Scene* scene)
 {
 	m_pendingLevelLoad = std::make_pair(levelFile, scene);
+}
+
+void dae::LevelManager::SpawnProjectileAt(int x, int y, TunnelDirection direction)
+{
+	auto go = std::make_unique<GameObject>();
+	go->SetPosition(x * m_tileWidth, y * m_tileHeight);
+	auto projectileComponent = std::make_unique<ProjectileComponent>(go.get(), direction);
+	m_projectileObjects[y][x] = go.get();
+	m_currentScene->Add(std::move(go));
+}
+
+bool dae::LevelManager::HasProjectileAt(int x, int y) const
+{
+	if (!IsInBounds(x, y) or m_currentLevel.empty())
+	{
+		return false;
+	}
+	return m_projectileObjects[y][x] != nullptr;
 }
 
 void dae::LevelManager::ProcessPendingLevelLoad()

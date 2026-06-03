@@ -19,6 +19,7 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   Player/LifeComponent.cpp
   Player/PlayerComponent.cpp
   Player/ScoreComponent.cpp
+  Player/MenuComponent.cpp
   SdlSoundSystem.cpp 
   Level/GoldComponent.cpp
   Level/GoldState.cpp

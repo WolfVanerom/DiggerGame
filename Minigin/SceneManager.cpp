@@ -9,11 +9,27 @@ void dae::SceneManager::Update(float deltaTime)
 	}
 }
 
+void dae::SceneManager::UpdateOneScene(float deltaTime)
+{
+	if (m_pActiveScene)
+	{
+		m_pActiveScene->Update(deltaTime);
+	}
+}
+
 void dae::SceneManager::FixedUpdate()
 {
 	for (auto& scene : m_scenes)
 	{
 		scene->FixedUpdate();
+	}
+}
+
+void dae::SceneManager::FixedUpdateOneScene()
+{
+	if (m_pActiveScene)
+	{
+		m_pActiveScene->FixedUpdate();
 	}
 }
 
@@ -23,6 +39,19 @@ void dae::SceneManager::Render()
 	{
 		scene->Render();
 	}
+}
+
+void dae::SceneManager::RenderOneScene()
+{
+	if (m_pActiveScene)
+	{
+		m_pActiveScene->Render();
+	}
+}
+
+void dae::SceneManager::SetActiveScene(Scene* pScene)
+{
+	m_pActiveScene = pScene;
 }
 
 void dae::SceneManager::CheckForDeletion()

@@ -9,7 +9,7 @@ namespace dae
 {
 
 	class Texture2D;
-	class GameObject final 
+	class GameObject final
 	{
 	protected:
 		Transform m_transform{};
