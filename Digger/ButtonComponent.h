@@ -19,7 +19,7 @@ namespace dae
 		void Highlight();
 		void Unhighlight();
 	private:
-		const std::function<void()> m_onClick;
 		TextComponent* m_pTextComponent{};
+		const std::function<void()> m_onClick;
 	};
 }
