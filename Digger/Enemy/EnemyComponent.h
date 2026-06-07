@@ -4,6 +4,7 @@
 #include "LevelManager.h"
 #include <glm/vec3.hpp>
 #include <TextureComponent.h>
+#include "ServiceLocator.h"
 
 namespace dae
 {
@@ -11,7 +12,15 @@ namespace dae
 	class PlayerComponent;
 	class NobbinState;
 	class HobbinState;
+	class PauseState;
 	class LevelManager;
+
+	enum class EnemyStateType
+	{
+		Nobbin,
+		Hobbin,
+		Pause
+	};
 
 	class EnemyComponent final : public Component
 	{
@@ -24,13 +33,15 @@ namespace dae
 		EnemyComponent& operator=(EnemyComponent&& other) = delete;
 		void Update(float deltaTime) override;
 		void SetState(EnemyState* newState);
+		void SetStateFromType(EnemyStateType newStateType);
 	protected:
 		LevelManager& m_levelManager{ LevelManager::GetInstance() };
-		EnemySpawnManager& m_enemySpawnManager{ EnemySpawnManager::GetInstance() };
+		EnemySpawnManager& m_enemySpawnManager{ dae::serviceLocator::GetEnemySpawnManager() };
 		TextureComponent* m_pTextureComponent{ nullptr };
 		NobbinState* m_pNobbinState{ nullptr };
 		HobbinState* m_pHobbinState{ nullptr };
 		EnemyState* m_pCurrentState{ nullptr };
+		PauseState* m_pPauseState{ nullptr };
 		glm::vec3 m_Direction{ 0.f, 0.f, 0.f };
 		glm::vec3 m_Position{ 0.f, 0.f, 0.f };
 		glm::vec3 m_PlayerPosition{ 0.f, 0.f, 0.f };
@@ -38,5 +49,6 @@ namespace dae
 		friend class EnemyState;
 		friend class NobbinState;
 		friend class HobbinState;
+		friend class PauseState;
 	};
 }

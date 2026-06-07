@@ -13,6 +13,9 @@ namespace dae
 	private:
 		int m_health{ 5 };
 		int m_score{ 0 };
+
+		float m_PlayerDeathAnimationTimer{ 0.f };
+
 		int m_previousCellX{ -1 };
 		int m_previousCellY{ -1 };
 		float m_previousWorldX{ 0.f };
@@ -21,8 +24,12 @@ namespace dae
 		bool m_isInTunnel{ false };
 		bool m_hasPreviousCell{ false };
 		bool m_goldBagPickup{ false };
+		bool m_isLocked{ false };
+		bool m_isPlayingDeathAnimation{ false };
 		TunnelDirection m_previousMovementDirection{ TunnelDirection::none };
 		TunnelDirection m_lockedMovementDirection{ TunnelDirection::none };
+
+		glm::vec3 m_startingPosition{ 0.f, 0.f, 0.f };
 
 		LevelManager& m_levelManager{ LevelManager::GetInstance() };
 		ProjectileComponent* m_pProjectileComponent{ nullptr };
@@ -36,9 +43,15 @@ namespace dae
 
 		void Update(float deltaTime) override;
 
+		void SetToStartingPosition();
+		void SwitchLockControls();
+		bool IsLocked() const;
+
 		void ShootProjectile(TunnelDirection direction);
 
 		void SubtractHealth(int amount);
+		void PlayDeathAnimation();
+
 		int GetHealth() const { return m_health; }
 		int GetScore() const { return m_score; }
 

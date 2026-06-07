@@ -30,10 +30,13 @@
 #include "Player/PlayerAccessor.h"
 #include "MenuComponent.h"
 #include "ButtonComponent.h"
+#include "LetterSwitchComponent.h"
 
 namespace fs = std::filesystem;
 
 auto& menuScene = dae::SceneManager::GetInstance().CreateScene();
+auto& ScoreSaveScreen = dae::SceneManager::GetInstance().CreateScene();
+auto& HighScoreScreen = dae::SceneManager::GetInstance().CreateScene();
 auto& scene = dae::SceneManager::GetInstance().CreateScene();
 
 static void StartGameFromMenu()
@@ -47,7 +50,11 @@ static void ExitGameFromMenu()
 }
 
 static void load() {
-	dae::SceneManager::GetInstance().SetActiveScene(&menuScene);
+	dae::serviceLocator::RegisterSoundSystem(std::make_unique<dae::SdlSoundSystem>());
+	dae::serviceLocator::RegisterPlayerAccessor(std::make_unique<dae::PlayerAccessor>());
+	dae::serviceLocator::RegisterEnemySpawnManager(std::make_unique<dae::EnemySpawnManager>());
+	dae::SceneManager::GetInstance().SetActiveScene(&ScoreSaveScreen);
+
 	auto levelManager = &dae::LevelManager::GetInstance();
 
 	auto menuGo = std::make_unique<dae::GameObject>();
@@ -107,6 +114,111 @@ static void load() {
 
 	menuScene.Add(std::move(menuGo));
 
+	menuGo = std::make_unique<dae::GameObject>();
+
+	menuTextComponent = std::make_unique<dae::TextComponent>(menuGo.get(), "Game Over", font.get(), SDL_Color{ 255, 255, 255, 255 });
+	menuTextComponent->SetPosition(350, 200);
+	menuGo->addComponent(std::move(menuTextComponent));
+
+	menuTextComponent = std::make_unique<dae::TextComponent>(menuGo.get(), ">", font.get(), SDL_Color{ 255, 255, 255, 255 });
+	menuTextComponent->SetPosition(400, 250);
+	auto* nextTextComponentPtr = menuTextComponent.get();
+	menuGo->addComponent(std::move(menuTextComponent));
+
+	buttonComponent = std::make_unique<dae::ButtonComponent>(menuGo.get(), nextTextComponentPtr, StartGameFromMenu);
+	auto* nextButtonComponentPtr = buttonComponent.get();
+	menuGo->addComponent(std::move(buttonComponent));
+
+	menuTextComponent = std::make_unique<dae::TextComponent>(menuGo.get(), "", font.get(), SDL_Color{ 255, 255, 255, 255 });
+	menuTextComponent->SetPosition(350, 250);
+	auto* Initial1TextComponentPtr = menuTextComponent.get();
+	menuGo->addComponent(std::move(menuTextComponent));
+
+	auto letterSwitchComponent = std::make_unique<dae::LetterSwitchComponent>(menuGo.get(), 'a', Initial1TextComponentPtr);
+	menuGo->addComponent(std::move(letterSwitchComponent));
+
+	menuTextComponent = std::make_unique<dae::TextComponent>(menuGo.get(), "<", font.get(), SDL_Color{ 255, 255, 255, 255 });
+	menuTextComponent->SetPosition(300, 250);
+	auto* previousTextComponentPtr = menuTextComponent.get();
+	menuGo->addComponent(std::move(menuTextComponent));
+
+	buttonComponent = std::make_unique<dae::ButtonComponent>(menuGo.get(), previousTextComponentPtr, StartGameFromMenu);
+	auto* previousButtonComponentPtr = buttonComponent.get();
+	menuGo->addComponent(std::move(buttonComponent));
+
+	menuTextComponent = std::make_unique<dae::TextComponent>(menuGo.get(), ">", font.get(), SDL_Color{ 255, 255, 255, 255 });
+	menuTextComponent->SetPosition(550, 250);
+	auto* nextTextComponentPtr2 = menuTextComponent.get();
+	menuGo->addComponent(std::move(menuTextComponent));
+
+	buttonComponent = std::make_unique<dae::ButtonComponent>(menuGo.get(), nextTextComponentPtr2, StartGameFromMenu);
+	auto* nextButtonComponentPtr2 = buttonComponent.get();
+	menuGo->addComponent(std::move(buttonComponent));
+
+	menuTextComponent = std::make_unique<dae::TextComponent>(menuGo.get(), "", font.get(), SDL_Color{ 255, 255, 255, 255 });
+	menuTextComponent->SetPosition(500, 250);
+	auto* Initial2TextComponentPtr = menuTextComponent.get();
+	menuGo->addComponent(std::move(menuTextComponent));
+
+	letterSwitchComponent = std::make_unique<dae::LetterSwitchComponent>(menuGo.get(), 'a', Initial2TextComponentPtr);
+	menuGo->addComponent(std::move(letterSwitchComponent));
+
+	menuTextComponent = std::make_unique<dae::TextComponent>(menuGo.get(), "<", font.get(), SDL_Color{ 255, 255, 255, 255 });
+	menuTextComponent->SetPosition(450, 250);
+	auto* previousTextComponentPtr2 = menuTextComponent.get();
+	menuGo->addComponent(std::move(menuTextComponent));
+
+	buttonComponent = std::make_unique<dae::ButtonComponent>(menuGo.get(), previousTextComponentPtr2, StartGameFromMenu);
+	auto* previousButtonComponentPtr2 = buttonComponent.get();
+	menuGo->addComponent(std::move(buttonComponent));
+
+	menuTextComponent = std::make_unique<dae::TextComponent>(menuGo.get(), ">", font.get(), SDL_Color{ 255, 255, 255, 255 });
+	menuTextComponent->SetPosition(700, 250);
+	auto* nextTextComponentPtr3 = menuTextComponent.get();
+	menuGo->addComponent(std::move(menuTextComponent));
+
+	buttonComponent = std::make_unique<dae::ButtonComponent>(menuGo.get(), nextTextComponentPtr3, StartGameFromMenu);
+	auto* nextButtonComponentPtr3 = buttonComponent.get();
+	menuGo->addComponent(std::move(buttonComponent));
+
+	menuTextComponent = std::make_unique<dae::TextComponent>(menuGo.get(), "", font.get(), SDL_Color{ 255, 255, 255, 255 });
+	menuTextComponent->SetPosition(650, 250);
+	auto* Initial3TextComponentPtr = menuTextComponent.get();
+	menuGo->addComponent(std::move(menuTextComponent));
+
+	letterSwitchComponent = std::make_unique<dae::LetterSwitchComponent>(menuGo.get(), 'a', Initial3TextComponentPtr);
+	menuGo->addComponent(std::move(letterSwitchComponent));
+
+	menuTextComponent = std::make_unique<dae::TextComponent>(menuGo.get(), "<", font.get(), SDL_Color{ 255, 255, 255, 255 });
+	menuTextComponent->SetPosition(600, 250);
+	auto* previousTextComponentPtr3 = menuTextComponent.get();
+	menuGo->addComponent(std::move(menuTextComponent));
+
+	buttonComponent = std::make_unique<dae::ButtonComponent>(menuGo.get(), previousTextComponentPtr3, StartGameFromMenu);
+	auto* previousButtonComponentPtr3 = buttonComponent.get();
+	menuGo->addComponent(std::move(buttonComponent));
+
+	// Create a menu component specifically for the score save screen (was missing, caused crash when reused)
+	menuComponent = std::make_unique<dae::MenuComponent>(menuGo.get(), &ScoreSaveScreen);
+	menuComponent->AddMenuItem(previousButtonComponentPtr, 0);
+	menuComponent->AddMenuItem(nextButtonComponentPtr, 0);
+	menuComponent->AddMenuItem(previousButtonComponentPtr2, 0);
+	menuComponent->AddMenuItem(nextButtonComponentPtr2, 0);
+	menuComponent->AddMenuItem(previousButtonComponentPtr3, 0);
+	menuComponent->AddMenuItem(nextButtonComponentPtr3, 0);
+
+	menuComponent->SetSelectedItem(previousButtonComponentPtr);
+
+	// Register menu input commands for this menu
+	dae::InputManager::GetInstance().AddMenuCommand(SDLK_UP, std::make_unique<dae::MenuMoveCommand>(menuGo.get(), menuComponent.get(), 0.f, -1.f));
+	dae::InputManager::GetInstance().AddMenuCommand(SDLK_DOWN, std::make_unique<dae::MenuMoveCommand>(menuGo.get(), menuComponent.get(), 0.f, 1.f));
+	dae::InputManager::GetInstance().AddMenuCommand(SDLK_LEFT, std::make_unique<dae::MenuMoveCommand>(menuGo.get(), menuComponent.get(), -1.f, 0.f));
+	dae::InputManager::GetInstance().AddMenuCommand(SDLK_RIGHT, std::make_unique<dae::MenuMoveCommand>(menuGo.get(), menuComponent.get(), 1.f, 0.f));
+	dae::InputManager::GetInstance().AddMenuCommand(SDLK_RETURN, std::make_unique<dae::MenuSelectCommand>(menuGo.get(), menuComponent.get()));
+
+	menuGo->addComponent(std::move(menuComponent));
+
+	ScoreSaveScreen.Add(std::move(menuGo));
 
     #if __EMSCRIPTEN__
 	levelManager->LoadLevel("levelData/1.txt", &scene);
@@ -115,6 +227,7 @@ static void load() {
 	#endif
 
 	auto& soundSystem = dae::serviceLocator::GetSoundSystem();
+	auto& playerAccessor = dae::serviceLocator::GetPlayerAccessor();
 	soundSystem.registerSound(1, "Data/media/audio/0.mp3");
 
 	//player 1
@@ -165,8 +278,7 @@ static void load() {
 	playerComponentPtr->AddObserver(deathComponentPtr);
 	scene.Add(std::move(go));
 
-	auto playerAccessor = &dae::PlayerAccessor::GetInstance();
-	playerAccessor->AddPlayer(playerComponentPtr);
+	playerAccessor.AddPlayer(playerComponentPtr);
 
 	//player 2
 
@@ -215,13 +327,13 @@ static void load() {
 	playerComponentPtr2->AddObserver(lifeComponentPtr2);
 	playerComponentPtr2->AddObserver(deathComponentPtr2);
 
-	playerAccessor->AddPlayer(playerComponentPtr2);
+	playerAccessor.AddPlayer(playerComponentPtr2);
 
 	scene.Add(std::move(go));
 
 	//enemy spawn manager
 	go = std::make_unique<dae::GameObject>();
-	auto enemySpawnManager = &dae::EnemySpawnManager::GetInstance();
+	auto enemySpawnManager = &dae::serviceLocator::GetEnemySpawnManager();
 	enemySpawnManager->Init(&scene, playerComponentPtr);
 	auto enemySpawnUpdateComponent = std::make_unique<dae::EnemySpawnUpdateComponent>(go.get());
 	go->addComponent(std::move(enemySpawnUpdateComponent));

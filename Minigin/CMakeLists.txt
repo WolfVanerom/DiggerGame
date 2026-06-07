@@ -8,12 +8,10 @@ set(MINIGIN_SOURCES
   ResourceManager.cpp
   Scene.cpp
   SceneManager.cpp
-  ServiceLocator.cpp
   TextComponent.cpp
   Texture2D.cpp
   TextureComponent.cpp
   Transform.cpp
-  ButtonComponent.cpp
 )
 
 add_library(minigin STATIC ${MINIGIN_SOURCES})

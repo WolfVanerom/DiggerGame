@@ -87,9 +87,7 @@ dae::Minigin::Minigin(const std::filesystem::path& dataPath)
 	{
 		throw std::runtime_error(std::string("SDL_CreateWindow Error: ") + SDL_GetError());
 	}
-
 	Renderer::GetInstance().Init(g_window);
-	dae::serviceLocator::RegisterSoundSystem(std::make_unique<dae::SdlSoundSystem>());
 	ResourceManager::GetInstance().Init(dataPath);
 	m_lastTime = std::chrono::high_resolution_clock::now();
 }

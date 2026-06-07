@@ -20,3 +20,19 @@ void dae::PlayerAccessor::AddPlayer(PlayerComponent* pPlayer)
 {
 	m_players.push_back(pPlayer);
 }
+
+void dae::PlayerAccessor::SwitchLockAllPlayerControls()
+{
+	for (auto* player : m_players)
+	{
+		player->SwitchLockControls();
+	}
+}
+
+void dae::PlayerAccessor::SetToStartingPositionAllPlayers()
+{
+	for (auto* player : m_players)
+	{
+		player->SetToStartingPosition();
+	}
+}

@@ -9,12 +9,15 @@ namespace dae
 		, m_pTextureComponent(pTextureComponent)
 		, m_pNobbinState(new NobbinState())
 		, m_pHobbinState(new HobbinState())
+		, m_pPauseState(new PauseState())
 		, m_pCurrentState(m_pNobbinState)
 	{
 		m_pNobbinState->m_pEnemyComponent = this;
 		m_pNobbinState->m_pPlayerComponent = pPlayerComponent;
 		m_pHobbinState->m_pEnemyComponent = this;
 		m_pHobbinState->m_pPlayerComponent = pPlayerComponent;
+		m_pPauseState->m_pEnemyComponent = this;
+		m_pPauseState->m_pPlayerComponent = pPlayerComponent;
 	}
 	void EnemyComponent::Update(float deltaTime)
 	{
@@ -26,5 +29,20 @@ namespace dae
 	void EnemyComponent::SetState(EnemyState* newState)
 	{
 		m_pCurrentState = newState;
+	}
+	void EnemyComponent::SetStateFromType(EnemyStateType newStateType)
+	{
+		switch (newStateType)
+		{
+		case EnemyStateType::Nobbin:
+			SetState(m_pNobbinState);
+			break;
+		case EnemyStateType::Hobbin:
+			SetState(m_pHobbinState);
+			break;
+		case EnemyStateType::Pause:
+			SetState(m_pPauseState);
+			break;
+		}
 	}
 }

@@ -31,4 +31,11 @@ namespace dae {
 		void OnExit() override;
 		void Update(float deltaTime) override;
 	};
+
+	class PauseState final : public EnemyState
+	{
+		void OnEnter() override;
+		void OnExit() override;
+		void Update(float deltaTime) override;
+	};
 }

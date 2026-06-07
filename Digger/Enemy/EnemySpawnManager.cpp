@@ -24,7 +24,7 @@ namespace dae
 
 	void EnemySpawnManager::SpawnEnemy(Scene* scene)
 	{
-		if (scene == nullptr or enemyCount >= currentMaxEnemyCount)
+		if (scene == nullptr or enemyCount >= currentMaxEnemyCount or m_SpawningPaused)
 		{
 			return;
 		}
@@ -43,6 +43,19 @@ namespace dae
 		scene->Add(std::move(go));
 		m_pEnemies.push_back(enemyPtr);
 		enemyCount++;
+	}
+
+	void EnemySpawnManager::SwitchPauseSpawning()
+	{
+		m_SpawningPaused = !m_SpawningPaused;
+	}
+
+	void EnemySpawnManager::PauseEnemies()
+	{
+		for (auto* enemy : m_pEnemies)
+		{
+			enemy->SetStateFromType(dae::EnemyStateType::Pause);
+		}
 	}
 
 	void EnemySpawnManager::RemoveEnemy(EnemyComponent* enemy)

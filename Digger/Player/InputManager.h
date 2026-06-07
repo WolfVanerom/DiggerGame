@@ -52,6 +52,11 @@ namespace dae
 				return;
 			}
 
+			if (m_playerComponent->IsLocked())
+			{
+				return;
+			}
+
 			if (m_offsetX < 0.f)
 			{
 				m_playerComponent->SetLockedMovementDirection(TunnelDirection::left);

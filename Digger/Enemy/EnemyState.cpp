@@ -211,4 +211,14 @@ namespace dae
 		//	}
 		//}
 	}
+
+	void PauseState::OnEnter()
+	{
+	}
+	void PauseState::OnExit()
+	{
+	}
+	void PauseState::Update(float)
+	{
+	}
 }

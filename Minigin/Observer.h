@@ -9,6 +9,7 @@ namespace dae {
 	{
 		None,
 		RemainingLivesChanged,
+		PlayerDeathAnimationFinished,
 		PlayerDied,
 		EnemyDefeated,
 		ScoreChanged,

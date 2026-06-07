@@ -5,12 +5,14 @@
 namespace dae
 {
 	class PlayerComponent;
-	class PlayerAccessor final : public Singleton<PlayerAccessor>
+	class PlayerAccessor final
 	{
 	public:
 		PlayerComponent* GetPlayer(size_t index) const;
 		std::vector<PlayerComponent*> GetPlayers() const;
 		void AddPlayer(PlayerComponent* pPlayer);
+		void SwitchLockAllPlayerControls();
+		void SetToStartingPositionAllPlayers();
 	private:
 		std::vector<PlayerComponent*> m_players;
 	};

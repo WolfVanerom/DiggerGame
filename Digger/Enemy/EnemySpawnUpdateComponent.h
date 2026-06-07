@@ -1,5 +1,7 @@
 #pragma once
 #include "Component.h"
+#include "EnemySpawnManager.h"
+#include "ServiceLocator.h"
 
 namespace dae
 {
@@ -15,7 +17,7 @@ namespace dae
 		EnemySpawnUpdateComponent& operator=(EnemySpawnUpdateComponent&& other) = delete;
 		void Update(float deltaTime) override;
 	protected:
-		EnemySpawnManager& m_enemySpawnManager{ EnemySpawnManager::GetInstance() };
+		EnemySpawnManager& m_enemySpawnManager{ dae::serviceLocator::GetEnemySpawnManager() };
 	private:
 	};
 }

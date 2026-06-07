@@ -50,7 +50,24 @@ dae::PlayerComponent::~PlayerComponent()
 
 void dae::PlayerComponent::Update(float deltaTime)
 {
-	(void)deltaTime;
+	if (m_isPlayingDeathAnimation)
+	{
+		m_PlayerDeathAnimationTimer += deltaTime;
+		// animtion logic goes here, for now we just wait for a certain amount of time before finishing the animation
+		if (m_PlayerDeathAnimationTimer >= 5.f)
+		{
+			if (m_health <= 0)
+			{
+				Notify(Event::PlayerDied, m_parent);
+			}
+			else {
+				Notify(Event::PlayerDeathAnimationFinished, m_parent);
+			}
+			m_isPlayingDeathAnimation = false;
+		}
+		return;
+	}
+
 	const auto& worldPos = m_parent->GetWorldPosition();
 	const float worldX = worldPos.x;
 	const float worldY = worldPos.y;
@@ -200,6 +217,21 @@ void dae::PlayerComponent::Update(float deltaTime)
 	m_previousMovementDirection = movementDirection;
 }
 
+void dae::PlayerComponent::SetToStartingPosition()
+{
+	m_parent->SetPosition(m_startingPosition);
+}
+
+void dae::PlayerComponent::SwitchLockControls()
+{
+	m_isLocked = !m_isLocked;
+}
+
+bool dae::PlayerComponent::IsLocked() const
+{
+	return m_isLocked;
+}
+
 void dae::PlayerComponent::ShootProjectile(TunnelDirection direction)
 {
 	m_levelManager.SpawnProjectileAt(m_previousCellX, m_previousCellY, direction);
@@ -210,11 +242,11 @@ void dae::PlayerComponent::SubtractHealth(int amount)
 	m_health -= amount;
 	m_health = std::max(0, m_health);
 	Notify(Event::RemainingLivesChanged, m_parent);
+}
 
-	if (m_health <= 0)
-	{
-		Notify(Event::PlayerDied, m_parent);
-	}
+void dae::PlayerComponent::PlayDeathAnimation()
+{
+	m_isPlayingDeathAnimation = true;
 }
 
 bool dae::PlayerComponent::IsPlayerInCell(int cellX, int cellY) const

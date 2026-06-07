@@ -5,6 +5,7 @@
 #include <vector>
 #include <optional>
 #include <map>
+#include <ServiceLocator.h>
 
 namespace dae
 {
@@ -42,6 +43,7 @@ namespace dae
 
 	class Scene;
 	class GameObject;
+	class EnemySpawnManager;
 	class LevelManager final : public Singleton<LevelManager>
 	{
 	private:
@@ -55,6 +57,8 @@ namespace dae
 		std::vector<std::string> m_currentLevel;
 		Scene* m_currentScene{ nullptr };
 		std::optional<std::pair<std::string, Scene*>> m_pendingLevelLoad;
+
+		EnemySpawnManager& m_enemySpawnManager{ dae::serviceLocator::GetEnemySpawnManager() };
 
 		void CreateCurrentNonEntityDrawObject(Scene* scene);
 		void CreateCurrentBackgroundObject(Scene* scene);

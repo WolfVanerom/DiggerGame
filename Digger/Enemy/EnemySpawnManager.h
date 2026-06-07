@@ -9,7 +9,7 @@ namespace dae
 	class Scene;
 	class PlayerComponent;
 
-	class EnemySpawnManager final : public Singleton<EnemySpawnManager>
+	class EnemySpawnManager final
 	{
 	public:
 		void Init(Scene* scene, PlayerComponent* playerComponent);
@@ -17,6 +17,8 @@ namespace dae
 		void Update(float deltaTime);
 
 		void SpawnEnemy(Scene* scene);
+		void SwitchPauseSpawning();
+		void PauseEnemies();
 		void RemoveEnemy(EnemyComponent* enemy);
 		void ClearEnemies();
 		void SpawnBonusCherry();
@@ -32,6 +34,7 @@ namespace dae
 		std::vector<EnemyComponent*> m_pEnemies{};
 		std::vector<int> m_MaxEnemyCountPerLevel{ 4, 5, 6, 7, 8 };
 		float m_SpawnTimer{ 0.0f };
+		bool m_SpawningPaused{ false };
 		Scene* m_pScene{ nullptr };
 		PlayerComponent* m_pPlayerComponent{ nullptr };
 	};

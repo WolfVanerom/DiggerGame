@@ -12,10 +12,6 @@ namespace dae
         , m_playerComponent{ playerComponent }
         , m_textComponent{ textComponent }
     {
-        if (m_textComponent && m_playerComponent)
-        {
-            m_textComponent->SetText("#Lives = " + std::to_string(m_playerComponent->GetHealth()));
-        }
     }
 
     void LifeComponent::Update(float) {
@@ -24,12 +20,27 @@ namespace dae
 
     void LifeComponent::OnNotify(Event event, GameObject*)
     {
-        if (event != Event::RemainingLivesChanged)
-            return;
 
-        if (m_textComponent && m_playerComponent)
+        if (event == Event::RemainingLivesChanged)
         {
-            m_textComponent->SetText("#Lives = " + std::to_string(m_playerComponent->GetHealth()));
+            m_enemySpawnManager.PauseEnemies();
+            m_playerAccessor.SwitchLockAllPlayerControls();
+            m_playerComponent->PlayDeathAnimation();
+
+            if (m_textComponent && m_playerComponent)
+            {
+                m_textComponent->SetText("#Lives = " + std::to_string(m_playerComponent->GetHealth()));
+            }
+		}
+        else if (event == Event::PlayerDeathAnimationFinished)
+        {
+			m_enemySpawnManager.ClearEnemies();
+			m_playerAccessor.SetToStartingPositionAllPlayers();
+			m_playerAccessor.SwitchLockAllPlayerControls();
+        }
+        else if (event == Event::PlayerDied)
+        {
+			// Handle player death logic, such as checking for game over or resetting the level
         }
     }
 }

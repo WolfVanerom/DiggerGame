@@ -212,7 +212,7 @@ void dae::LevelManager::LoadLevel(const std::string& levelFile, Scene* scene)
 {
 	m_currentScene = scene;
 
-	EnemySpawnManager::GetInstance().SetMaxEnemyCountForLevel(m_currentLevelIndex);
+	m_enemySpawnManager.SetMaxEnemyCountForLevel(m_currentLevelIndex);
 
 	m_amountOfEmeralds = -1;
 
@@ -274,7 +274,7 @@ void dae::LevelManager::ClearLevel()
 	m_currentLevel.clear();
     m_tileObjects.clear();
 	m_projectileObjects.clear();
-	EnemySpawnManager::GetInstance().ClearEnemies();
+	m_enemySpawnManager.ClearEnemies();
     if (!m_EntityObjects.empty())
 	{
 		for (auto& row : m_EntityObjects)
