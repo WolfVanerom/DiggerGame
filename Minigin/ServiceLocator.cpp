@@ -3,3 +3,5 @@
 std::unique_ptr<dae::soundSystem> dae::serviceLocator::m_soundSystemInstance = nullptr;
 std::unique_ptr<dae::PlayerAccessor> dae::serviceLocator::m_playerAccessorInstance = nullptr;
 std::unique_ptr<dae::EnemySpawnManager> dae::serviceLocator::m_enemySpawnManagerInstance = nullptr;
+std::unique_ptr<dae::GameDataManager> dae::serviceLocator::m_gameDataManagerInstance = nullptr;
+std::unique_ptr<dae::GamePadSystem> dae::serviceLocator::m_gamePadSystemInstance = nullptr;

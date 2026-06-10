@@ -5,6 +5,7 @@
 #include <cmath>
 #include <memory>
 #include <unordered_map>
+#include <unordered_set>
 #include <MenuComponent.h>
 
 namespace dae
@@ -161,21 +162,93 @@ namespace dae
 	{
 	private:
 		std::unordered_map<int, std::unique_ptr<Command>> m_commands;
-		std::unordered_map<int, std::unique_ptr<Command>> m_menuCommands;
+		std::unordered_map<int, std::unique_ptr<Command>>* m_activeMenuCommands;
+		std::unordered_map<int, std::unique_ptr<Command>> m_startMenuCommands {};
+		std::unordered_map<int, std::unique_ptr<Command>> m_ScoreSaveMenuCommands {};
+		std::unordered_map<int, std::unique_ptr<Command>> m_HighScoreMenuCommands {};
+		std::unordered_map<int, std::unique_ptr<Command>> m_commandsController;
+		std::unordered_map<int, std::unique_ptr<Command>>* m_activeMenuCommandsController;
+		std::unordered_map<int, std::unique_ptr<Command>> m_startMenuCommandsController{};
+		std::unordered_map<int, std::unique_ptr<Command>> m_ScoreSaveMenuCommandsController{};
+		std::unordered_map<int, std::unique_ptr<Command>> m_HighScoreMenuCommandsController{};
+		std::unordered_set<int> m_heldControllerButtons;
+
+		float m_ButtonRepeatDelay{ 2 };
+		float m_ButtonRepeatTimer{ 0 };
+
+		void ChangeMenuCommandContextKeyboard(int menuContext) {
+			switch (menuContext)
+			{
+			case 0:
+				m_activeMenuCommands = &m_startMenuCommands;
+				break;
+			case 1:
+				m_activeMenuCommands = &m_ScoreSaveMenuCommands;
+				break;
+			case 2:
+				m_activeMenuCommands = &m_HighScoreMenuCommands;
+				break;
+			default:
+				break;
+			}
+		}
+
+		void ChangeMenuCommandContextController(int menuContext) {
+			switch (menuContext)
+			{
+			case 0:
+				m_activeMenuCommandsController = &m_startMenuCommandsController;
+				break;
+			case 1:
+				m_activeMenuCommandsController = &m_ScoreSaveMenuCommandsController;
+				break;
+			case 2:
+				m_activeMenuCommandsController = &m_HighScoreMenuCommandsController;
+				break;
+			default:
+				break;
+			}
+		}
 	public:
 		bool ProcessInput();
 		void AddCommand(int key, std::unique_ptr<Command> command) {
 			m_commands[key] = std::move(command);
 		}
-		void AddMenuCommand(int key, std::unique_ptr<Command> command) {
-			m_menuCommands[key] = std::move(command);
+
+		void AddCommandController(int key, std::unique_ptr<Command> command) {
+			m_commandsController[key] = std::move(command);
 		}
+
+
+		void ChangeMenuCommandContext(int menuContext) {
+			ChangeMenuCommandContextKeyboard(menuContext);
+			ChangeMenuCommandContextController(menuContext);
+		}
+
+		void AddMenuCommand(int key, std::unique_ptr<Command> command) {
+			m_activeMenuCommands->insert({ key, std::move(command) });
+		}
+
+		void AddMenuCommandController(int key, std::unique_ptr<Command> command) {
+			m_activeMenuCommandsController->insert({ key, std::move(command) });
+		}
+
 		void RemoveCommand(int key) {
 			m_commands.erase(key);
 		}
-		void RemoveMenuCommand(int key) {
-			m_menuCommands.erase(key);
+
+		void RemoveCommandController(int key) {
+			m_commandsController.erase(key);
 		}
+
+		void RemoveMenuCommand(int key) {
+			m_activeMenuCommands->erase(key);
+		}
+
+		void RemoveMenuCommandController(int key) {
+			m_activeMenuCommandsController->erase(key);
+		}
+
 		void RemoveCommandsForGameObject(dae::GameObject* gameObject) {
 			for (auto it = m_commands.begin(); it != m_commands.end(); ) {
 				GameObjectCommand* gameObjectCommand = dynamic_cast<GameObjectCommand*>(it->second.get());
@@ -188,10 +261,10 @@ namespace dae
 			}
 		}
 		void RemoveMenuCommandsForGameObject(dae::GameObject* gameObject) {
-			for (auto it = m_menuCommands.begin(); it != m_menuCommands.end(); ) {
+			for (auto it = m_activeMenuCommands->begin(); it != m_activeMenuCommands->end(); ) {
 				GameObjectCommand* gameObjectCommand = dynamic_cast<GameObjectCommand*>(it->second.get());
 				if (gameObjectCommand && gameObjectCommand->m_gameObject == gameObject) {
-					it = m_menuCommands.erase(it);
+					it = m_activeMenuCommands->erase(it);
 				}
 				else {
 					++it;

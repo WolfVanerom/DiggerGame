@@ -20,8 +20,6 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   Player/PlayerComponent.cpp
   Player/ScoreComponent.cpp
   Player/MenuComponent.cpp
-  ServiceLocator.cpp
-  SdlSoundSystem.cpp 
   Level/GoldComponent.cpp
   Level/GoldState.cpp
   Enemy/EnemySpawnManager.cpp
@@ -31,7 +29,8 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   Player/ProjectileComponent.cpp 
   Player/PlayerAccessor.cpp
   ButtonComponent.cpp
- "LetterSwitchComponent.cpp")
+  LetterSwitchComponent.cpp
+  GameDataManager.cpp "Player/PlayerDamageComponent.cpp")
 
 target_compile_features(${TARGET_NAME} PUBLIC cxx_std_20)
 

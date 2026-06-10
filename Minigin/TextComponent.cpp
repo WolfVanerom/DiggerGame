@@ -14,7 +14,7 @@ void dae::TextComponent::Update(float)
 {
 	if (m_needsUpdate)
 	{
-		const auto surf = TTF_RenderText_Blended(m_font->GetFont(), m_text.c_str(), 0, m_color);
+		const auto surf = TTF_RenderText_Blended_Wrapped(m_font->GetFont(), m_text.c_str(), 0, m_color, m_WrappingWidth);
 		if (surf == nullptr) 
 		{
 			throw std::runtime_error(std::string("Render text failed: ") + SDL_GetError());
@@ -60,6 +60,13 @@ void dae::TextComponent::SetPosition(const float x, const float y)
 void dae::TextComponent::SetScale(const float scale)
 {
 	m_scale = scale;
+	m_needsUpdate = true;
+}
+
+void dae::TextComponent::SetWrappingWidth(int width)
+{
+	m_WrappingWidth = width;
+	m_needsUpdate = true;
 }
 
 void dae::TextComponent::SetColor(const SDL_Color& color)

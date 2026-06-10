@@ -51,7 +51,28 @@ void dae::SceneManager::RenderOneScene()
 
 void dae::SceneManager::SetActiveScene(Scene* pScene)
 {
+	if (m_pActiveScene != nullptr)
+	{
+		m_pActiveScene->OnSceneExit();
+	}
 	m_pActiveScene = pScene;
+	m_pActiveScene->OnSceneEnter();
+}
+
+void dae::SceneManager::OnSceneEnter(Scene* pScene)
+{
+	if (pScene)
+	{
+		pScene->OnSceneEnter();
+	}
+}
+
+void dae::SceneManager::OnSceneExit(Scene* pScene)
+{
+	if (pScene)
+	{
+		pScene->OnSceneExit();
+	}
 }
 
 void dae::SceneManager::CheckForDeletion()
@@ -62,8 +83,8 @@ void dae::SceneManager::CheckForDeletion()
 	}
 }
 
-dae::Scene& dae::SceneManager::CreateScene()
+dae::Scene& dae::SceneManager::CreateScene(const std::function<void()>& onSceneEnter, const std::function<void()>& onSceneExit)
 {
-	m_scenes.emplace_back(std::unique_ptr<Scene>(new Scene()));
+	m_scenes.emplace_back(std::unique_ptr<Scene>(new Scene(onSceneEnter, onSceneExit)));
 	return *m_scenes.back();
 }

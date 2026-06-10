@@ -34,6 +34,10 @@ namespace dae
 	void LetterSwitchComponent::PreviousLetter()
 	{
 		auto it = std::find(m_Alphabet.begin(), m_Alphabet.end(), m_Letter);
+		if (it == m_Alphabet.begin())
+		{
+			return;
+		}
 		if (it != m_Alphabet.end())
 		{
 			it = std::prev(it);

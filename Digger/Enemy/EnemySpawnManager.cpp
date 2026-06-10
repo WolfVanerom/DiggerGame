@@ -3,6 +3,7 @@
 #include <GameObject.h>
 #include "EnemyComponent.h"
 #include "LevelManager.h"
+#include <HitBoxComponent.h>
 
 namespace dae
 {
@@ -30,14 +31,18 @@ namespace dae
 		}
 
 		auto go = std::make_unique<GameObject>();
+
 		auto textureComponent = std::make_unique<TextureComponent>(go.get());
 		textureComponent->SetTexture("media/cnob1.png");
 		textureComponent->SetDrawSize(LevelManager::m_tileWidth, LevelManager::m_tileHeight);
-		auto enemyComponent = std::make_unique<EnemyComponent>(go.get(), m_pPlayerComponent, textureComponent.get());
 
+		auto enemyComponent = std::make_unique<EnemyComponent>(go.get(), m_pPlayerComponent, textureComponent.get());
 		auto* enemyPtr = enemyComponent.get();
 
+		auto hitboxComponent = std::make_unique<HitBoxComponent>(go.get(), dae::HitboxLayer::Enemy, glm::vec2(16, 16), glm::vec2(0, 0));
+
 		go->addComponent(std::move(textureComponent));
+		go->addComponent(std::move(hitboxComponent));
 		go->addComponent(std::move(enemyComponent));
 
 		scene->Add(std::move(go));

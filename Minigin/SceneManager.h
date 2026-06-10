@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <functional>
 #include "Scene.h"
 #include "Singleton.h"
 
@@ -11,7 +12,7 @@ namespace dae
 	class SceneManager final : public Singleton<SceneManager>
 	{
 	public:
-		Scene& CreateScene();
+		Scene& CreateScene(const std::function<void()>& onSceneEnter = []() {}, const std::function<void()>& onSceneExit = []() {});
 
 		void Update(float deltaTime);
 		void UpdateOneScene(float deltaTime);
@@ -21,6 +22,8 @@ namespace dae
 		void RenderOneScene();
 
 		void SetActiveScene(Scene* pScene);
+		void OnSceneEnter(Scene* pScene);
+		void OnSceneExit(Scene* pScene);
 
 		void CheckForDeletion();
 	private:

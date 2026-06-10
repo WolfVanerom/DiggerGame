@@ -18,6 +18,7 @@ namespace dae
 		void SetText(const std::string& text);
 		void SetPosition(float x, float y);
 		void SetScale(float scale);
+		void SetWrappingWidth(int width);
 		void SetColor(const SDL_Color& color);
 
 		float GetWidth() const;
@@ -34,6 +35,7 @@ namespace dae
 		std::string m_text{};
 		SDL_Color m_color{ 255, 255, 255, 255 };
         float m_scale{ 1.0f };
+		int m_WrappingWidth{ 400 };
 		Transform m_transform{};
 		Font* m_font{};
 		std::shared_ptr<Texture2D> m_textTexture{};

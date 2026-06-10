@@ -14,7 +14,9 @@ namespace dae
     {
         if (m_textComponent && m_playerComponent)
         {
-            m_textComponent->SetText("#Score = " + std::to_string(m_playerComponent->GetScore()));
+			auto score = m_playerComponent->GetScore();
+			m_gameDataManager.SetCurrentScore(score);
+            m_textComponent->SetText("#Score = " + std::to_string(score));
         }
     }
 
@@ -29,7 +31,9 @@ namespace dae
 
         if (m_textComponent && m_playerComponent)
         {
-            m_textComponent->SetText("#Score = " + std::to_string(m_playerComponent->GetScore()));
+            auto score = m_playerComponent->GetScore();
+			m_gameDataManager.SetCurrentScore(score);
+            m_textComponent->SetText("#Score = " + std::to_string(score));
         }
     }
 }

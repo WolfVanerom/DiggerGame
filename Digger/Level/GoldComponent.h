@@ -3,14 +3,11 @@
 #include "LevelManager.h"
 #include "PlayerAccessor.h"
 #include <ServiceLocator.h>
+#include <GoldState.h>
 
 namespace dae {
 	class GameObject;
 	class LevelManager;
-	class GoldState;
-	class IdleState;
-	class FallingState;
-	class BrokenState;
 
 	class GoldComponent final : public Component
 	{
@@ -24,9 +21,11 @@ namespace dae {
 		void Update(float deltaTime) override;
 		void SetState(GoldState* state) {m_pCurrentState = state; }
 		bool HasBroken() const { return m_Broken; }
+		bool IsDangerous() const { return typeid(*m_pCurrentState) == typeid(FallingState); }
 	protected:
 		bool m_HasFallen{ false };
 		bool m_Broken{ false };
+		bool m_Dangerous{ false };
 		int m_originalCellX{ -1 };
 		int m_originalCellY{ -1 };
 		LevelManager& m_levelManager{ LevelManager::GetInstance() };

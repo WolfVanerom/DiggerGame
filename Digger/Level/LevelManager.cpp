@@ -12,6 +12,7 @@
 #include <SDL3/SDL_log.h>
 #include <ProjectileComponent.h>
 #include <Enemy/EnemySpawnManager.h>
+#include <HitBoxComponent.h>
 
 void dae::LevelManager::CreateCurrentNonEntityDrawObject(Scene* scene)
 {
@@ -114,6 +115,9 @@ void dae::LevelManager::SpawnLevelObject(LevelObjectType type, int x, int y, Sce
 
 		auto goldComponent = std::make_unique<GoldComponent>(go.get());
 		go->addComponent(std::move(goldComponent));
+
+		auto hitboxComponent = std::make_unique<HitBoxComponent>(go.get(), dae::HitboxLayer::Item, glm::vec2(m_tileWidth, m_tileHeight), glm::vec2(0, 0));
+		go->addComponent(std::move(hitboxComponent));
 
 		m_EntityObjects[y][x] = go.get();
 		scene->Add(std::move(go));

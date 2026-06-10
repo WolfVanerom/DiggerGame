@@ -3,6 +3,8 @@
 #include "SoundSystem.h"
 #include <PlayerAccessor.h>
 #include <Enemy/EnemySpawnManager.h>
+#include <GameDataManager.h>
+#include <GamePadSystem.h>
 
 namespace dae {
 	class serviceLocator final
@@ -10,6 +12,8 @@ namespace dae {
 		static std::unique_ptr<soundSystem> m_soundSystemInstance;
 		static std::unique_ptr<PlayerAccessor> m_playerAccessorInstance;
 		static std::unique_ptr<EnemySpawnManager> m_enemySpawnManagerInstance;
+		static std::unique_ptr<GameDataManager> m_gameDataManagerInstance;
+		static std::unique_ptr<GamePadSystem> m_gamePadSystemInstance;
 	public:
 		static soundSystem& GetSoundSystem()
 		{
@@ -34,6 +38,22 @@ namespace dae {
 		static EnemySpawnManager& GetEnemySpawnManager()
 		{
 			return *m_enemySpawnManagerInstance;
+		}
+		static void RegisterGameDataManager(std::unique_ptr<GameDataManager> service)
+		{
+			m_gameDataManagerInstance = std::move(service);
+		}
+		static GameDataManager& GetGameDataManager()
+		{
+			return *m_gameDataManagerInstance;
+		}
+		static void RegisterGamePadSystem(std::unique_ptr<GamePadSystem> service)
+		{
+			m_gamePadSystemInstance = std::move(service);
+		}
+		static GamePadSystem& GetGamePadSystem()
+		{
+			return *m_gamePadSystemInstance;
 		}
 	};
 }

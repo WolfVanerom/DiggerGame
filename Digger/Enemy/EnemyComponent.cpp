@@ -1,6 +1,5 @@
 #include "EnemyComponent.h"
 #include "EnemyState.h"
-#include "PlayerComponent.h"
 
 namespace dae
 {

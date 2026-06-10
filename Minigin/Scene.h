@@ -19,6 +19,9 @@ namespace dae
 		void Render() const;
 		void CheckForDeletion();
 
+		void OnSceneEnter() const;
+		void OnSceneExit() const;
+
 		~Scene() = default;
 		Scene(const Scene& other) = delete;
 		Scene(Scene&& other) = delete;
@@ -27,9 +30,11 @@ namespace dae
 
 	private:
 		friend class SceneManager;
-		explicit Scene() = default;
+		explicit Scene(const std::function<void()>& onSceneEnter = []() {}, const std::function<void()>& onSceneExit = []() {});
 
 		std::vector < std::unique_ptr<GameObject>> m_objects{};
+		const std::function<void()> m_onSceneEnter{nullptr};
+		const std::function<void()> m_onSceneExit{nullptr};
 	};
 
 }

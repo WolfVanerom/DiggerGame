@@ -3,6 +3,11 @@
 
 using namespace dae;
 
+Scene::Scene(const std::function<void()>& onSceneEnter, const std::function<void()>& onSceneExit)
+	: m_onSceneEnter(onSceneEnter), m_onSceneExit(onSceneExit)
+{
+}
+
 void Scene::Add(std::unique_ptr<GameObject> object)
 {
 	assert(object != nullptr && "Cannot add a null GameObject to the scene.");
@@ -70,5 +75,19 @@ void dae::Scene::CheckForDeletion()
 		),
 		m_objects.end()
 	);
+}
+
+void Scene::OnSceneEnter() const
+{
+	if (m_onSceneEnter != nullptr) {
+		m_onSceneEnter();
+	}
+}
+
+void Scene::OnSceneExit() const
+{
+	if (m_onSceneExit != nullptr) {
+		m_onSceneExit();
+	}
 }
 

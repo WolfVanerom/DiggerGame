@@ -12,9 +12,11 @@ set(MINIGIN_SOURCES
   Texture2D.cpp
   TextureComponent.cpp
   Transform.cpp
+  ServiceLocator.cpp
+  SdlSoundSystem.cpp
 )
 
-add_library(minigin STATIC ${MINIGIN_SOURCES})
+add_library(minigin STATIC ${MINIGIN_SOURCES} "SdlGamePadSystem.cpp" "HitBoxComponent.cpp")
 
 target_compile_features(minigin PUBLIC cxx_std_20)
 
