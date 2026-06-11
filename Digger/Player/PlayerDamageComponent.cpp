@@ -9,6 +9,8 @@ namespace dae
 	PlayerDamageComponent::PlayerDamageComponent(GameObject* owner, PlayerComponent* player, HitBoxComponent* hitbox)
 		: Component(owner), m_player(player), m_hitbox(hitbox)
 	{
+		m_currentGameMode = serviceLocator::GetGameDataManager().GetGameMode();
+		m_playerNumber = player->GetPlayerNumber();
 	}
 
 	void PlayerDamageComponent::Update(float deltatime)
@@ -19,16 +21,23 @@ namespace dae
 			return;
 		}
 
-		for (auto* other : HitBoxComponent::GetAll())
+		for (auto* other : HitBoxComponent::CheckAll())
 		{
-			if (other == nullptr || other == m_hitbox) continue;
-			if (!m_hitbox->Overlaps(*other)) continue;
+			if (other == nullptr || other == m_hitbox) {
+				continue;
+			}
+			if (!m_hitbox->Overlaps(*other)) {
+				continue;
+			}
 
-			if (other->GetLayer() == HitboxLayer::Enemy)
+			if((m_currentGameMode == GameMode::Versus and m_playerNumber == 1) or (m_currentGameMode == GameMode::SinglePlayer) or (m_currentGameMode == GameMode::Coop))
 			{
-				m_player->SubtractHealth(1);
-				m_invulnrebilityTimer = 0.75f;
-				return;
+				if (other->GetLayer() == HitboxLayer::Enemy)
+				{
+					m_player->SubtractHealth(1);
+					m_invulnrebilityTimer = 0.75f;
+					return;
+				}
 			}
 
 			if (other->GetLayer() == HitboxLayer::Item)

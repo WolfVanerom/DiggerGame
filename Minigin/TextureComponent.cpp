@@ -20,13 +20,13 @@ void dae::TextureComponent::Render() const
 	const auto& pos = m_parent->GetWorldPosition();
 	if (!m_isTiled or m_tileArea.x <= 0.f or m_tileArea.y <= 0.f)
 	{
-		if (m_drawSize.x > 0.f && m_drawSize.y > 0.f)
+		if (m_flipHorizontal or m_flipVertical)
 		{
-			Renderer::GetInstance().RenderTexture(*m_texture, pos.x, pos.y, m_drawSize.x, m_drawSize.y);
+			Renderer::GetInstance().RenderTextureFlipped(*m_texture, pos.x, pos.y, m_drawSize.x, m_drawSize.y, m_flipHorizontal, m_flipVertical);
+			return;
 		}
-		else
-		{
-			Renderer::GetInstance().RenderTexture(*m_texture, pos.x, pos.y);
+		else {
+			Renderer::GetInstance().RenderTexture(*m_texture, pos.x, pos.y, m_drawSize.x, m_drawSize.y);
 		}
 		return;
 	}
@@ -68,4 +68,14 @@ void dae::TextureComponent::SetDrawSize(const float width, const float height)
 {
 	m_drawSize.x = width;
 	m_drawSize.y = height;
+}
+
+void dae::TextureComponent::FlipHorizontal(const bool flip)
+{
+	m_flipHorizontal = flip;
+}
+
+void dae::TextureComponent::FlipVertical(const bool flip)
+{
+	m_flipVertical = flip;
 }

@@ -15,6 +15,8 @@ namespace dae
 		void SetTiling(bool isTiled);
 		void SetTileArea(float width, float height);
 		void SetDrawSize(float width, float height);
+		void FlipHorizontal(bool flip);
+		void FlipVertical(bool flip);
 
 		float GetWidth() const { return m_drawSize.x; }
 		float GetHeight() const { return m_drawSize.y; }
@@ -30,5 +32,7 @@ namespace dae
 		bool m_isTiled{ false };
 		glm::vec2 m_tileArea{};
 		glm::vec2 m_drawSize{};
+		bool m_flipHorizontal{ false };
+		bool m_flipVertical{ false };
 	};
 }

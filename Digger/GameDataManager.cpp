@@ -16,4 +16,14 @@ namespace dae
 	{
 		return m_CurrentScore;
 	}
+
+	void GameDataManager::SetGameMode(GameMode mode)
+	{
+		m_GameMode = mode;
+	}
+
+	GameMode GameDataManager::GetGameMode() const
+	{
+		return m_GameMode;
+	}
 }

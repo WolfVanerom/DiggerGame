@@ -7,6 +7,7 @@
 #include <imgui.h>
 #include <backends/imgui_impl_sdl3.h>
 #include <backends/imgui_impl_sdlrenderer3.h>
+#include <SDL3/SDL.h>
 
 void dae::Renderer::Init(SDL_Window* window)
 {
@@ -63,15 +64,6 @@ void dae::Renderer::Destroy()
 	}
 }
 
-void dae::Renderer::RenderTexture(const Texture2D& texture, const float x, const float y) const
-{
-	SDL_FRect dst{};
-	dst.x = x;
-	dst.y = y;
-	SDL_GetTextureSize(texture.GetSDLTexture(), &dst.w, &dst.h);
-	SDL_RenderTexture(GetSDLRenderer(), texture.GetSDLTexture(), nullptr, &dst);
-}
-
 void dae::Renderer::RenderTexture(const Texture2D& texture, const float x, const float y, const float width, const float height) const
 {
 	SDL_FRect dst{};
@@ -97,6 +89,38 @@ void dae::Renderer::RenderTexture(const Texture2D& texture, const float x, const
 	dst.h = height;
 
 	SDL_RenderTexture(GetSDLRenderer(), texture.GetSDLTexture(), &src, &dst);
+}
+
+void dae::Renderer::RenderTextureFlipped(const Texture2D& texture, const float x, const float y, const float width, const float height, const bool flipHorizontal, const bool flipVertical) const
+{
+	SDL_FlipMode flip = SDL_FLIP_NONE;
+
+	if (flipHorizontal) {
+		flip = static_cast<SDL_FlipMode>(flip | SDL_FLIP_HORIZONTAL);
+	}
+
+	if (flipVertical) {
+		flip = static_cast<SDL_FlipMode>(flip | SDL_FLIP_VERTICAL);
+	}
+
+	SDL_FRect dst{};
+	dst.x = x;
+	dst.y = y;
+	dst.w = width;
+	dst.h = height;
+
+	SDL_RenderTextureRotated(GetSDLRenderer(), texture.GetSDLTexture(), nullptr, &dst, 0.0, nullptr, flip);
+}
+
+void dae::Renderer::RenderRect(const float x, const float y, const float width, const float height, const Uint8 r, const Uint8 g, const Uint8 b, const Uint8 a) const
+{
+	SDL_SetRenderDrawColor(GetSDLRenderer(), r, g, b, a);
+	SDL_FRect rect{};
+	rect.x = x;
+	rect.y = y;
+	rect.w = width;
+	rect.h = height;
+	SDL_RenderFillRect(GetSDLRenderer(), &rect);
 }
 
 SDL_Renderer* dae::Renderer::GetSDLRenderer() const { return m_renderer; }

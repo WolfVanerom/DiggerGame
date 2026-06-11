@@ -257,6 +257,7 @@ void dae::LevelManager::LoadLevel(const std::string& levelFile, Scene* scene)
 
 	m_currentLevel = std::move(loadedLevel);
 	m_EntityObjects.assign(m_maxHeight, std::vector<GameObject*>(m_maxWidth, nullptr));
+	m_projectileObjects.assign(m_maxHeight, std::vector<GameObject*>(m_maxWidth, nullptr));
 	CreateCurrentBackgroundObject(scene);
 	CreateCurrentNonEntityDrawObject(scene);
 	for (int y = 0; y < m_maxHeight; ++y)
@@ -419,6 +420,7 @@ std::vector<dae::TunnelPreview> dae::LevelManager::GetAllTunnelPreviews() const
 
 void dae::LevelManager::QueueLevelLoad(const std::string& levelFile, Scene* scene)
 {
+	m_soundSystem.playSound(5, 0.25f, false);
 	m_pendingLevelLoad = std::make_pair(levelFile, scene);
 }
 
@@ -426,7 +428,13 @@ void dae::LevelManager::SpawnProjectileAt(int x, int y, TunnelDirection directio
 {
 	auto go = std::make_unique<GameObject>();
 	go->SetPosition(x * m_tileWidth, y * m_tileHeight);
+	auto textureComponent = std::make_unique<TextureComponent>(go.get());
+	textureComponent->SetTexture("media/cfire1.png");
+	textureComponent->SetDrawSize(m_tileWidth, m_tileHeight);
 	auto projectileComponent = std::make_unique<ProjectileComponent>(go.get(), direction);
+	go->addComponent(std::move(textureComponent));
+	go->addComponent(std::move(projectileComponent));
+
 	m_projectileObjects[y][x] = go.get();
 	m_currentScene->Add(std::move(go));
 }

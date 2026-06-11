@@ -32,8 +32,9 @@
 #include "ButtonComponent.h"
 #include "LetterSwitchComponent.h"
 #include <fstream>
-#include <SdlGamePadSystem.h>
 #include <HitBoxComponent.h>
+#include <SdlGamePadSystem.h>
+#include "Player/PlayerDamageComponent.h"
 
 namespace fs = std::filesystem;
 
@@ -80,6 +81,156 @@ static void ReturnToStartMenu()
 
 static void StartGameFromMenu()
 {
+	dae::SceneManager::GetInstance().SetActiveScene(&scene);
+}
+
+static void StartCoOpGameFromMenu()
+{
+	dae::serviceLocator::GetGameDataManager().SetGameMode(dae::GameMode::Coop);
+	auto font = dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", 36);
+	auto go = std::make_unique<dae::GameObject>();
+	auto textComponent = std::make_unique<dae::TextComponent>(go.get(), "#Lives = 5", font.get(), SDL_Color{ 255, 255, 255, 255 });
+	textComponent->SetPosition(0, 100);
+	auto livesTextComponentPtr = textComponent.get();
+	go->addComponent(std::move(textComponent));
+	scene.Add(std::move(go));
+
+	go = std::make_unique<dae::GameObject>();
+	textComponent = std::make_unique<dae::TextComponent>(go.get(), "#Score = 0", font.get(), SDL_Color{ 255, 255, 255, 255 });
+	textComponent->SetPosition(0, 150);
+	auto scoreTextComponentPtr = textComponent.get();
+	go->addComponent(std::move(textComponent));
+	scene.Add(std::move(go));
+
+	go = std::make_unique<dae::GameObject>();
+	go->SetPosition(220, 200);
+	auto textureComponent = std::make_unique<dae::TextureComponent>(go.get());
+	textureComponent->SetTexture("cldig1.png");
+	textureComponent->SetDrawSize(32, 32);
+	auto* textureComponentPtr2 = textureComponent.get();
+	go->addComponent(std::move(textureComponent));
+	auto playerComponent = std::make_unique<dae::PlayerComponent>(go.get(), textureComponentPtr2);
+	auto* playerComponentPtr2 = playerComponent.get();
+	go->addComponent(std::move(playerComponent));
+
+	dae::InputManager::GetInstance().AddCommand(SDLK_UP, std::make_unique<dae::moveCommand>(go.get(), playerComponentPtr2, 0.0f, -10.0f));
+	dae::InputManager::GetInstance().AddCommand(SDLK_DOWN, std::make_unique<dae::moveCommand>(go.get(), playerComponentPtr2, 0.0f, 10.0f));
+	dae::InputManager::GetInstance().AddCommand(SDLK_LEFT, std::make_unique<dae::moveCommand>(go.get(), playerComponentPtr2, -10.0f, 0.0f));
+	dae::InputManager::GetInstance().AddCommand(SDLK_RIGHT, std::make_unique<dae::moveCommand>(go.get(), playerComponentPtr2, 10.0f, 0.0f));
+	dae::InputManager::GetInstance().AddCommand(SDLK_RSHIFT, std::make_unique<dae::shootCommand>(go.get(), playerComponentPtr2));
+
+	auto scoreComponent2 = std::make_unique<dae::ScoreComponent>(go.get(), playerComponentPtr2, scoreTextComponentPtr);
+	auto* scoreComponentPtr2 = scoreComponent2.get();
+	go->addComponent(std::move(scoreComponent2));
+
+	auto lifeComponent2 = std::make_unique<dae::LifeComponent>(go.get(), playerComponentPtr2, livesTextComponentPtr);
+	auto* lifeComponentPtr2 = lifeComponent2.get();
+	go->addComponent(std::move(lifeComponent2));
+
+	auto deathComponent2 = std::make_unique<dae::DeathComponent>(go.get());
+	auto* deathComponentPtr2 = deathComponent2.get();
+	go->addComponent(std::move(deathComponent2));
+
+	playerComponentPtr2->AddObserver(scoreComponentPtr2);
+	playerComponentPtr2->AddObserver(lifeComponentPtr2);
+	playerComponentPtr2->AddObserver(deathComponentPtr2);
+
+	auto currentGameMode = dae::serviceLocator::GetGameDataManager().GetGameMode();
+
+	auto hitboxComponent = std::make_unique<dae::HitBoxComponent>(go.get(), dae::HitboxLayer::Player, glm::vec2(32, 32), glm::vec2(0, 0));
+	dae::HitBoxComponent* hitboxComponentPtr2{};
+	if (currentGameMode == dae::GameMode::Versus) {
+		hitboxComponent = std::make_unique<dae::HitBoxComponent>(go.get(), dae::HitboxLayer::Enemy, glm::vec2(32, 32), glm::vec2(0, 0));
+		hitboxComponentPtr2 = hitboxComponent.get();
+	}
+	else {
+		hitboxComponent = std::make_unique<dae::HitBoxComponent>(go.get(), dae::HitboxLayer::Player, glm::vec2(32, 32), glm::vec2(0, 0));
+		hitboxComponentPtr2 = hitboxComponent.get();
+	}
+	go->addComponent(std::move(hitboxComponent));
+
+	auto playerDamageComponent = std::make_unique<dae::PlayerDamageComponent>(go.get(), playerComponentPtr2, hitboxComponentPtr2);
+	go->addComponent(std::move(playerDamageComponent));
+
+	auto playerAccessor = dae::serviceLocator::GetPlayerAccessor();
+	playerAccessor.AddPlayer(playerComponentPtr2);
+
+	scene.Add(std::move(go));
+	dae::SceneManager::GetInstance().SetActiveScene(&scene);
+}
+
+static void StartVersusGameFromMenu()
+{
+	dae::serviceLocator::GetGameDataManager().SetGameMode(dae::GameMode::Versus);
+	auto font = dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", 36);
+	auto go = std::make_unique<dae::GameObject>();
+	auto textComponent = std::make_unique<dae::TextComponent>(go.get(), "#Lives = 5", font.get(), SDL_Color{ 255, 255, 255, 255 });
+	textComponent->SetPosition(0, 100);
+	auto livesTextComponentPtr = textComponent.get();
+	go->addComponent(std::move(textComponent));
+	scene.Add(std::move(go));
+
+	go = std::make_unique<dae::GameObject>();
+	textComponent = std::make_unique<dae::TextComponent>(go.get(), "#Score = 0", font.get(), SDL_Color{ 255, 255, 255, 255 });
+	textComponent->SetPosition(0, 150);
+	auto scoreTextComponentPtr = textComponent.get();
+	go->addComponent(std::move(textComponent));
+	scene.Add(std::move(go));
+
+	go = std::make_unique<dae::GameObject>();
+	go->SetPosition(220, 200);
+	auto textureComponent = std::make_unique<dae::TextureComponent>(go.get());
+	textureComponent->SetTexture("cldig1.png");
+	textureComponent->SetDrawSize(32, 32);
+	auto* textureComponentPtr2 = textureComponent.get();
+	go->addComponent(std::move(textureComponent));
+	auto playerComponent = std::make_unique<dae::PlayerComponent>(go.get(), textureComponentPtr2);
+	auto* playerComponentPtr2 = playerComponent.get();
+	go->addComponent(std::move(playerComponent));
+
+	dae::InputManager::GetInstance().AddCommand(SDLK_UP, std::make_unique<dae::moveCommand>(go.get(), playerComponentPtr2, 0.0f, -10.0f));
+	dae::InputManager::GetInstance().AddCommand(SDLK_DOWN, std::make_unique<dae::moveCommand>(go.get(), playerComponentPtr2, 0.0f, 10.0f));
+	dae::InputManager::GetInstance().AddCommand(SDLK_LEFT, std::make_unique<dae::moveCommand>(go.get(), playerComponentPtr2, -10.0f, 0.0f));
+	dae::InputManager::GetInstance().AddCommand(SDLK_RIGHT, std::make_unique<dae::moveCommand>(go.get(), playerComponentPtr2, 10.0f, 0.0f));
+	dae::InputManager::GetInstance().AddCommand(SDLK_RSHIFT, std::make_unique<dae::shootCommand>(go.get(), playerComponentPtr2));
+
+	auto scoreComponent2 = std::make_unique<dae::ScoreComponent>(go.get(), playerComponentPtr2, scoreTextComponentPtr);
+	auto* scoreComponentPtr2 = scoreComponent2.get();
+	go->addComponent(std::move(scoreComponent2));
+
+	auto lifeComponent2 = std::make_unique<dae::LifeComponent>(go.get(), playerComponentPtr2, livesTextComponentPtr);
+	auto* lifeComponentPtr2 = lifeComponent2.get();
+	go->addComponent(std::move(lifeComponent2));
+
+	auto deathComponent2 = std::make_unique<dae::DeathComponent>(go.get());
+	auto* deathComponentPtr2 = deathComponent2.get();
+	go->addComponent(std::move(deathComponent2));
+
+	playerComponentPtr2->AddObserver(scoreComponentPtr2);
+	playerComponentPtr2->AddObserver(lifeComponentPtr2);
+	playerComponentPtr2->AddObserver(deathComponentPtr2);
+
+	auto currentGameMode = dae::serviceLocator::GetGameDataManager().GetGameMode();
+
+	auto hitboxComponent = std::make_unique<dae::HitBoxComponent>(go.get(), dae::HitboxLayer::Player, glm::vec2(32, 32), glm::vec2(0, 0));
+	dae::HitBoxComponent* hitboxComponentPtr2{};
+	if (currentGameMode == dae::GameMode::Versus) {
+		hitboxComponent = std::make_unique<dae::HitBoxComponent>(go.get(), dae::HitboxLayer::Enemy, glm::vec2(32, 32), glm::vec2(0, 0));
+		hitboxComponentPtr2 = hitboxComponent.get();
+	}
+	else {
+		hitboxComponent = std::make_unique<dae::HitBoxComponent>(go.get(), dae::HitboxLayer::Player, glm::vec2(32, 32), glm::vec2(0, 0));
+		hitboxComponentPtr2 = hitboxComponent.get();
+	}
+	go->addComponent(std::move(hitboxComponent));
+
+	auto playerDamageComponent = std::make_unique<dae::PlayerDamageComponent>(go.get(), playerComponentPtr2, hitboxComponentPtr2);
+	go->addComponent(std::move(playerDamageComponent));
+
+	auto playerAccessor = dae::serviceLocator::GetPlayerAccessor();
+	playerAccessor.AddPlayer(playerComponentPtr2);
+
+	scene.Add(std::move(go));
 	dae::SceneManager::GetInstance().SetActiveScene(&scene);
 }
 
@@ -160,7 +311,7 @@ static void load() {
 	auto& gamePadSystem = dae::serviceLocator::GetGamePadSystem();
 	gamePadSystem.Initialize();
 
-	dae::SceneManager::GetInstance().SetActiveScene(&ScoreSaveScreen);
+	dae::SceneManager::GetInstance().SetActiveScene(&menuScene);
 
 	auto levelManager = &dae::LevelManager::GetInstance();
 
@@ -181,7 +332,7 @@ static void load() {
 	auto* coOpTextComponentPtr = menuTextComponent.get();
 	menuGo->addComponent(std::move(menuTextComponent));
 
-	buttonComponent = std::make_unique<dae::ButtonComponent>(menuGo.get(), coOpTextComponentPtr, StartGameFromMenu);
+	buttonComponent = std::make_unique<dae::ButtonComponent>(menuGo.get(), coOpTextComponentPtr, StartCoOpGameFromMenu);
 	auto* coOpButtonComponentPtr = buttonComponent.get();
 	menuGo->addComponent(std::move(buttonComponent));
 
@@ -190,7 +341,7 @@ static void load() {
 	auto* vsTextComponentPtr = menuTextComponent.get();
 	menuGo->addComponent(std::move(menuTextComponent));
 
-	buttonComponent = std::make_unique<dae::ButtonComponent>(menuGo.get(), vsTextComponentPtr, StartGameFromMenu);
+	buttonComponent = std::make_unique<dae::ButtonComponent>(menuGo.get(), vsTextComponentPtr, StartVersusGameFromMenu);
 	auto* vsButtonComponentPtr = buttonComponent.get();
 	menuGo->addComponent(std::move(buttonComponent));
 
@@ -391,6 +542,10 @@ static void load() {
 	auto& soundSystem = dae::serviceLocator::GetSoundSystem();
 	auto& playerAccessor = dae::serviceLocator::GetPlayerAccessor();
 	soundSystem.registerSound(1, "Data/media/audio/0.mp3");
+	soundSystem.registerSound(2, "Data/media/audio/MainTheme.mp3");
+	soundSystem.registerSound(3, "Data/media/audio/BonusTheme.mp3");
+	soundSystem.registerSound(4, "Data/media/audio/DeathSound.mp3");
+	soundSystem.registerSound(5, "Data/media/audio/LevelComplete.mp3");
 
 	//player 1
 
@@ -412,8 +567,10 @@ static void load() {
 	go->SetPosition(180, 200);
 	auto textureComponent = std::make_unique<dae::TextureComponent>(go.get());
 	textureComponent->SetTexture("cldig1.png");
+	textureComponent->SetDrawSize(32, 32);
+	auto* textureComponentPtr = textureComponent.get();
 	go->addComponent(std::move(textureComponent));
-	auto playerComponent = std::make_unique<dae::PlayerComponent>(go.get());
+	auto playerComponent = std::make_unique<dae::PlayerComponent>(go.get(), textureComponentPtr);
 	auto* playerComponentPtr = playerComponent.get();
 	go->addComponent(std::move(playerComponent));
 	
@@ -421,7 +578,7 @@ static void load() {
 	dae::InputManager::GetInstance().AddCommand(SDLK_S, std::make_unique<dae::moveCommand>(go.get(), playerComponentPtr, 0.0f, 10.0f));
 	dae::InputManager::GetInstance().AddCommand(SDLK_A, std::make_unique<dae::moveCommand>(go.get(), playerComponentPtr, -10.0f, 0.0f));
 	dae::InputManager::GetInstance().AddCommand(SDLK_D, std::make_unique<dae::moveCommand>(go.get(), playerComponentPtr, 10.0f, 0.0f));
-	dae::InputManager::GetInstance().AddCommand(SDLK_SPACE, std::make_unique<dae::damageCommand>(go.get(), playerComponentPtr));
+	dae::InputManager::GetInstance().AddCommand(SDLK_SPACE, std::make_unique<dae::shootCommand>(go.get(), playerComponentPtr));
 	dae::InputManager::GetInstance().AddCommandController(SDL_GAMEPAD_BUTTON_DPAD_UP, std::make_unique<dae::moveCommand>(go.get(), playerComponentPtr, 0.0f, -10.0f));
 	dae::InputManager::GetInstance().AddCommandController(SDL_GAMEPAD_BUTTON_DPAD_DOWN, std::make_unique<dae::moveCommand>(go.get(), playerComponentPtr, 0.0f, 10.0f));
 	dae::InputManager::GetInstance().AddCommandController(SDL_GAMEPAD_BUTTON_DPAD_LEFT, std::make_unique<dae::moveCommand>(go.get(), playerComponentPtr, -10.0f, 0.0f));
@@ -443,64 +600,14 @@ static void load() {
 	playerComponentPtr->AddObserver(lifeComponentPtr);
 	playerComponentPtr->AddObserver(deathComponentPtr);
 
-	auto hitboxComponent = std::make_unique<dae::HitBoxComponent>(go.get(), dae::HitboxLayer::Player, glm::vec2(16, 16), glm::vec2(0, 0));
+	auto hitboxComponent = std::make_unique<dae::HitBoxComponent>(go.get(), dae::HitboxLayer::Player, glm::vec2(32, 32), glm::vec2(0, 0));
+	auto* hitboxComponentPtr = hitboxComponent.get();
 	go->addComponent(std::move(hitboxComponent));
 
+	auto playerDamageComponent = std::make_unique<dae::PlayerDamageComponent>(go.get(), playerComponentPtr, hitboxComponentPtr);
+	go->addComponent(std::move(playerDamageComponent));
+
 	playerAccessor.AddPlayer(playerComponentPtr);
-
-	scene.Add(std::move(go));
-
-	//player 2
-
-	go = std::make_unique<dae::GameObject>();
-	textComponent = std::make_unique<dae::TextComponent>(go.get(), "#Lives = 5", font.get(), SDL_Color{ 255, 255, 255, 255 });
-	textComponent->SetPosition(0, 100);
-	livesTextComponentPtr = textComponent.get();
-	go->addComponent(std::move(textComponent));
-	scene.Add(std::move(go));
-
-	go = std::make_unique<dae::GameObject>();
-	textComponent = std::make_unique<dae::TextComponent>(go.get(), "#Score = 0", font.get(), SDL_Color{ 255, 255, 255, 255 });
-	textComponent->SetPosition(0, 150);
-	scoreTextComponentPtr = textComponent.get();
-	go->addComponent(std::move(textComponent));
-	scene.Add(std::move(go));
-
-	go = std::make_unique<dae::GameObject>();
-	go->SetPosition(220, 200);
-	textureComponent = std::make_unique<dae::TextureComponent>(go.get());
-	textureComponent->SetTexture("cldig1.png");
-	go->addComponent(std::move(textureComponent));
-	playerComponent = std::make_unique<dae::PlayerComponent>(go.get());
-	auto* playerComponentPtr2 = playerComponent.get();
-	go->addComponent(std::move(playerComponent));
-	
-	dae::InputManager::GetInstance().AddCommand(SDLK_UP, std::make_unique<dae::moveCommand>(go.get(), playerComponentPtr2, 0.0f, -10.0f));
-	dae::InputManager::GetInstance().AddCommand(SDLK_DOWN, std::make_unique<dae::moveCommand>(go.get(), playerComponentPtr2, 0.0f, 10.0f));
-	dae::InputManager::GetInstance().AddCommand(SDLK_LEFT, std::make_unique<dae::moveCommand>(go.get(), playerComponentPtr2, -10.0f, 0.0f));
-	dae::InputManager::GetInstance().AddCommand(SDLK_RIGHT, std::make_unique<dae::moveCommand>(go.get(), playerComponentPtr2, 10.0f, 0.0f));
-	dae::InputManager::GetInstance().AddCommand(SDLK_RSHIFT, std::make_unique<dae::damageCommand>(go.get(), playerComponentPtr2));
-
-	auto scoreComponent2 = std::make_unique<dae::ScoreComponent>(go.get(), playerComponentPtr2, scoreTextComponentPtr);
-	auto* scoreComponentPtr2 = scoreComponent2.get();
-	go->addComponent(std::move(scoreComponent2));
-
-	auto lifeComponent2 = std::make_unique<dae::LifeComponent>(go.get(), playerComponentPtr2, livesTextComponentPtr);
-	auto* lifeComponentPtr2 = lifeComponent2.get();
-	go->addComponent(std::move(lifeComponent2));
-
-	auto deathComponent2 = std::make_unique<dae::DeathComponent>(go.get());
-	auto* deathComponentPtr2 = deathComponent2.get();
-	go->addComponent(std::move(deathComponent2));
-
-	playerComponentPtr2->AddObserver(scoreComponentPtr2);
-	playerComponentPtr2->AddObserver(lifeComponentPtr2);
-	playerComponentPtr2->AddObserver(deathComponentPtr2);
-
-	auto hitboxComponent2 = std::make_unique<dae::HitBoxComponent>(go.get(), dae::HitboxLayer::Player, glm::vec2(16, 16), glm::vec2(0, 0));
-	go->addComponent(std::move(hitboxComponent2));
-
-	playerAccessor.AddPlayer(playerComponentPtr2);
 
 	scene.Add(std::move(go));
 
@@ -533,7 +640,9 @@ static void load() {
 	go->addComponent(std::move(textComponent));
 	scene.Add(std::move(go));
 
-	dae::InputManager::GetInstance().ChangeMenuCommandContext(1);
+	dae::InputManager::GetInstance().ChangeMenuCommandContext(0);
+	soundSystem.playSound(2, 0.25f, true);
+	dae::InputManager::GetInstance().AddCommand(SDLK_F7, std::make_unique<dae::SwitchMuteSoundCommand>());
 }
 
 int main(int, char*[]) {

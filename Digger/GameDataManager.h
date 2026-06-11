@@ -4,6 +4,13 @@
 #include <string>
 namespace dae
 {
+	enum class GameMode
+	{
+		SinglePlayer,
+		Coop,
+		Versus
+	};
+
 	class GameDataManager final
 	{
 	public:
@@ -16,8 +23,11 @@ namespace dae
 		std::string GetHighScorePath() const;
 		void SetCurrentScore(int score);
 		int GetCurrentScore() const;
+		void SetGameMode(GameMode mode);
+		GameMode GetGameMode() const;
 	private:
 		const std::string m_HighScoreFilePath{ "highscores.txt" };
 		int m_CurrentScore{ 0 };
+		GameMode m_GameMode{ GameMode::SinglePlayer };
 	};
 }

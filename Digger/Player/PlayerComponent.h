@@ -3,16 +3,17 @@
 #include "Observer.h"
 #include <memory>
 #include "LevelManager.h"
-#include "ProjectileComponent.h"
 
 namespace dae
 {
-
+	class ProjectileComponent;
+	class TextureComponent;
 	class PlayerComponent final : public Component, public subject
 	{
 	private:
 		int m_health{ 5 };
 		int m_score{ 0 };
+		int m_playerNumber{};
 
 		float m_PlayerDeathAnimationTimer{ 0.f };
 
@@ -33,8 +34,11 @@ namespace dae
 
 		LevelManager& m_levelManager{ LevelManager::GetInstance() };
 		ProjectileComponent* m_pProjectileComponent{ nullptr };
+		TextureComponent* m_pTextureComponent{ nullptr };
+
+		void ChangePlayerTextureDirection(TunnelDirection direction);
 	public:
-		PlayerComponent(GameObject* pOwner);
+		PlayerComponent(GameObject* pOwner, TextureComponent* pTextureComponent);
 		~PlayerComponent() override;
 		PlayerComponent(const PlayerComponent& other) = delete;
 		PlayerComponent(PlayerComponent&& other) = delete;
@@ -54,6 +58,7 @@ namespace dae
 
 		int GetHealth() const { return m_health; }
 		int GetScore() const { return m_score; }
+		int GetPlayerNumber() const { return m_playerNumber; }
 
 		bool IsPlayerInCell(int cellX, int cellY) const;
 

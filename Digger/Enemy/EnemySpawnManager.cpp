@@ -39,7 +39,7 @@ namespace dae
 		auto enemyComponent = std::make_unique<EnemyComponent>(go.get(), m_pPlayerComponent, textureComponent.get());
 		auto* enemyPtr = enemyComponent.get();
 
-		auto hitboxComponent = std::make_unique<HitBoxComponent>(go.get(), dae::HitboxLayer::Enemy, glm::vec2(16, 16), glm::vec2(0, 0));
+		auto hitboxComponent = std::make_unique<HitBoxComponent>(go.get(), dae::HitboxLayer::Enemy, glm::vec2(LevelManager::m_tileWidth, LevelManager::m_tileHeight), glm::vec2(0, 0));
 
 		go->addComponent(std::move(textureComponent));
 		go->addComponent(std::move(hitboxComponent));

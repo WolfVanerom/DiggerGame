@@ -13,7 +13,9 @@ namespace dae
 		void AddPlayer(PlayerComponent* pPlayer);
 		void SwitchLockAllPlayerControls();
 		void SetToStartingPositionAllPlayers();
+		int GetNextPlayerNumber();
 	private:
 		std::vector<PlayerComponent*> m_players;
+		int m_nextPlayerNumber{ 1 };
 	};
 }

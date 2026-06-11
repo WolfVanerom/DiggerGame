@@ -1,9 +1,11 @@
 #include "ProjectileComponent.h"
 #include <Level/LevelManager.h>
 #include <GameObject.h>
+#include <SDL3/SDL.h>
 
 namespace dae
 {
+
 	ProjectileComponent::ProjectileComponent(GameObject* pOwner, TunnelDirection direction)
 		: Component(pOwner), m_Direction(direction)
 	{

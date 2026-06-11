@@ -1,5 +1,6 @@
 #pragma once
 #include "Component.h"
+#include <GameDataManager.h>
 
 namespace dae
 {
@@ -14,5 +15,7 @@ namespace dae
 		PlayerComponent* m_player;
 		HitBoxComponent* m_hitbox;
 		float m_invulnrebilityTimer{};
+		GameMode m_currentGameMode{};
+		int m_playerNumber{};
 	};
 }

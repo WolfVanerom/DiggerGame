@@ -59,6 +59,7 @@ namespace dae
 		std::optional<std::pair<std::string, Scene*>> m_pendingLevelLoad;
 
 		EnemySpawnManager& m_enemySpawnManager{ dae::serviceLocator::GetEnemySpawnManager() };
+		soundSystem& m_soundSystem{ dae::serviceLocator::GetSoundSystem() };
 
 		void CreateCurrentNonEntityDrawObject(Scene* scene);
 		void CreateCurrentBackgroundObject(Scene* scene);

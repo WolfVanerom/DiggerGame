@@ -1,20 +1,19 @@
 #include "HitBoxComponent.h"
 #include "GameObject.h"
 #include <algorithm>
+#include "Renderer.h"
 
 namespace dae
 {
-	std::vector<HitBoxComponent*> HitBoxComponent::m_allHitboxes = std::vector<HitBoxComponent*>();
-
 	HitBoxComponent::HitBoxComponent(GameObject* owner, HitboxLayer layer, glm::vec2 size, glm::vec2 offset)
 		: Component(owner), m_layer(layer), m_size(size), m_offset(offset)
 	{
-		m_allHitboxes.push_back(this);
+		GetHitboxes().push_back(this);
 	}
 
 	HitBoxComponent::~HitBoxComponent()
 	{
-		m_allHitboxes.erase(std::remove(m_allHitboxes.begin(), m_allHitboxes.end(), this), m_allHitboxes.end());
+		GetHitboxes().erase(std::remove(GetHitboxes().begin(), GetHitboxes().end(), this), GetHitboxes().end());
 	}
 
 	void HitBoxComponent::Update(float)
@@ -24,16 +23,25 @@ namespace dae
 
 	WorldBounds HitBoxComponent::GetWorldBounds() const
 	{
-		const auto p = m_parent->GetWorldPosition();
-		return WorldBounds{ p.x + m_offset.x, p.y + m_offset.y, m_size.x, m_size.y };
+		const auto bounds = m_parent->GetWorldPosition();
+		return WorldBounds{ bounds.x + m_offset.x, bounds.y + m_offset.y, m_size.x, m_size.y };
 	}
 
 	bool HitBoxComponent::Overlaps(const HitBoxComponent& other) const
 	{
-		const auto a = GetWorldBounds();
-		const auto b = other.GetWorldBounds();
+		const auto bounds = GetWorldBounds();
+		const auto otherBounds = other.GetWorldBounds();
 
-		return a.x < (b.x + b.w) && (a.x + a.w) > b.x && a.y < (b.y + b.h) && (a.y + a.h) > b.y;
+		return bounds.x < (otherBounds.x + otherBounds.w) && (bounds.x + bounds.w) > otherBounds.x && bounds.y < (otherBounds.y + otherBounds.h) && (bounds.y + bounds.h) > otherBounds.y;
+	}
+
+	void HitBoxComponent::Render() const
+	{
+		if (m_RenderThisHitbox)
+		{
+			const auto bounds = GetWorldBounds();
+			Renderer::GetInstance().RenderRect(bounds.x, bounds.y, bounds.w, bounds.h, 255, 0, 0);
+		}
 	}
 
 	HitboxLayer HitBoxComponent::GetLayer() const
@@ -41,8 +49,14 @@ namespace dae
 		return m_layer;
 	}
 
-	const std::vector<HitBoxComponent*>& HitBoxComponent::GetAll()
+	const std::vector<HitBoxComponent*>& HitBoxComponent::CheckAll()
 	{
-		return m_allHitboxes;
+		return GetHitboxes();
+	}
+
+	std::vector<HitBoxComponent*>& HitBoxComponent::GetHitboxes()
+	{
+		static auto* registry = new std::vector<HitBoxComponent*>();
+		return *registry;
 	}
 }

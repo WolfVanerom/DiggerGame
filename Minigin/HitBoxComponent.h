@@ -29,15 +29,17 @@ namespace dae
 		void Update(float deltaTime) override;
 		WorldBounds GetWorldBounds() const;
 		bool Overlaps(const HitBoxComponent& other) const;
+		void Render() const override;
 
 		HitboxLayer GetLayer() const;
-		static const std::vector<HitBoxComponent*>& GetAll();
+		static const std::vector<HitBoxComponent*>& CheckAll();
 
 	private:
 		HitboxLayer m_layer{};
 		glm::vec2 m_size{};
 		glm::vec2 m_offset{};
+		bool m_RenderThisHitbox{ true };
 
-		static std::vector<HitBoxComponent*> m_allHitboxes;
+		static std::vector<HitBoxComponent*>& GetHitboxes();
 	};
 }

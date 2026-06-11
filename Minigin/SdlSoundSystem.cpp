@@ -51,11 +51,11 @@ namespace dae
 		MIX_Quit();
 	}
 
-	void SdlSoundSystem::playSound(const soundId id, const float volume)
+	void SdlSoundSystem::playSound(const soundId id, const float volume, const bool loop)
 	{
 		{
 			std::lock_guard lock(m_queueMutex);
-			m_pendingEvents.push(SoundEvent{ id, std::clamp(volume, 0.0f, 1.0f) });
+			m_pendingEvents.push(SoundEvent{ id, std::clamp(volume, 0.0f, 1.0f), loop });
 		}
 		m_queueCv.notify_one();
 	}
@@ -66,7 +66,62 @@ namespace dae
 		m_soundPaths[id] = path;
 	}
 
-	void SdlSoundSystem::processSound(const soundId id, const float volume)
+	void SdlSoundSystem::pauseSound(const soundId id)
+	{
+		std::lock_guard lock(m_audioMutex);
+		for (auto track : m_activeTracks)
+		{
+			if (track != nullptr && MIX_GetTrackAudio(track) == getOrLoadAudio(id))
+			{
+				MIX_PauseTrack(track);
+			}
+		}
+	}
+
+	void SdlSoundSystem::resumeSound(const soundId id)
+	{
+		std::lock_guard lock(m_audioMutex);
+		for (auto track : m_activeTracks)
+		{
+			if (track != nullptr && MIX_GetTrackAudio(track) == getOrLoadAudio(id))
+			{
+				MIX_ResumeTrack(track);
+			}
+		}
+	}
+
+	void SdlSoundSystem::pauseAllSounds()
+	{
+		m_isMuted = true;
+		std::lock_guard lock(m_audioMutex);
+		for (auto track : m_activeTracks)
+		{
+			if (track != nullptr)
+			{
+				MIX_PauseTrack(track);
+			}
+		}
+	}
+
+	void SdlSoundSystem::resumeAllSounds()
+	{
+		m_isMuted = false;
+		std::lock_guard lock(m_audioMutex);
+		for (auto track : m_activeTracks)
+		{
+			if (track != nullptr)
+			{
+				MIX_ResumeTrack(track);
+			}
+		}
+	}
+
+	bool SdlSoundSystem::getIsMuted() const
+	{
+		return m_isMuted;
+	}
+
+	void SdlSoundSystem::processSound(const soundId id, const float volume, const bool loop)
 	{
 		if (m_mixer == nullptr)
 		{
@@ -80,6 +135,14 @@ namespace dae
 			if (audio == nullptr)
 			{
 				return;
+			}
+
+			for (auto track : m_activeTracks)
+			{
+				if (track != nullptr && MIX_GetTrackAudio(track) == audio)
+				{
+					MIX_PlayTrack(track, loop ? -1 : 0);
+				}
 			}
 
 			MIX_Track* track = MIX_CreateTrack(m_mixer);
@@ -98,7 +161,7 @@ namespace dae
 			{
 			}
 
-			if (!MIX_PlayTrack(track, 0))
+			if (!MIX_PlayTrack(track, loop ? -1 : 0))
 			{
 				MIX_DestroyTrack(track);
 				return;
@@ -129,7 +192,7 @@ namespace dae
 				m_pendingEvents.pop();
 			}
 
-			processSound(event.id, event.volume);
+			processSound(event.id, event.volume, event.loop);
 			cleanupFinishedTracks();
 		}
 	}

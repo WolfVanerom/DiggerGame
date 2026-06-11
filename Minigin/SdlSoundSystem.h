@@ -20,18 +20,26 @@ namespace dae
 		SdlSoundSystem();
 		~SdlSoundSystem() override;
 
-		void playSound(const soundId id, const float volume) override;
+		void playSound(const soundId id, const float volume, const bool loop) override;
 		void registerSound(const soundId id, const std::string& path) override;
+		void pauseSound(const soundId id) override;
+		void resumeSound(const soundId id) override;
+		void pauseAllSounds() override;
+		void resumeAllSounds() override;
+		bool getIsMuted() const;
 
 	protected:
-		void processSound(const soundId id, const float volume);
+		void processSound(const soundId id, const float volume, const bool loop);
 
 	private:
 		struct SoundEvent
 		{
 			soundId id{};
 			float volume{};
+			bool loop{};
 		};
+
+		bool m_isMuted{ false };
 
 		void workerLoop();
 		MIX_Audio* getOrLoadAudio(const soundId id);
@@ -59,6 +67,10 @@ namespace dae
 
 		void playSound(const soundId, const float) override {}
 		void registerSound(const soundId, const std::string&) override {}
+		void pauseSound(const soundId) override {}
+		void resumeSound(const soundId) override {}
+		void pauseAllSounds() override {}
+		void resumeAllSounds() override {}
 	};
 #endif
 }

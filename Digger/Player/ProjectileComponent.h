@@ -18,7 +18,7 @@ namespace dae
 	protected:
 		LevelManager* m_pLevelManager{ nullptr };
 		TunnelDirection m_Direction{ TunnelDirection::none };
-		float m_MoveOffsetDistance{ 0.10f };
+		float m_MoveOffsetDistance{ 10.f };
 		glm::vec3 m_MoveOffset{ 0.f, 0.f, 0.f };
 	private:
 		glm::vec3 DirectionToMoveOffset(TunnelDirection direction);

@@ -3,6 +3,7 @@
 #include <algorithm>
 #include "ServiceLocator.h"
 #include "GoldComponent.h"
+#include <TextureComponent.h>
 
 using dae::TunnelDirection;
 using dae::LevelObjectType;
@@ -39,9 +40,31 @@ dae::LevelObjectType GetTrailType(TunnelDirection direction)
 	return LevelObjectType::none;
 }
 
-dae::PlayerComponent::PlayerComponent(GameObject* pOwner)
-	:Component(pOwner)
+void dae::PlayerComponent::ChangePlayerTextureDirection(TunnelDirection direction)
 {
+	switch (direction)
+	{
+	case TunnelDirection::up:
+		m_pTextureComponent->FlipHorizontal(false);
+		break;
+	case TunnelDirection::down:
+		m_pTextureComponent->FlipHorizontal(false);
+		break;
+	case TunnelDirection::left:
+		m_pTextureComponent->FlipHorizontal(false);
+		break;
+	case TunnelDirection::right:
+		m_pTextureComponent->FlipHorizontal(true);
+		break;
+	default:
+		break;
+	}
+}
+
+dae::PlayerComponent::PlayerComponent(GameObject* pOwner, TextureComponent* pTextureComponent)
+	:Component(pOwner), m_pTextureComponent(pTextureComponent)
+{
+	m_playerNumber = serviceLocator::GetPlayerAccessor().GetNextPlayerNumber();
 }
 
 dae::PlayerComponent::~PlayerComponent()
@@ -53,8 +76,7 @@ void dae::PlayerComponent::Update(float deltaTime)
 	if (m_isPlayingDeathAnimation)
 	{
 		m_PlayerDeathAnimationTimer += deltaTime;
-		// animtion logic goes here, for now we just wait for a certain amount of time before finishing the animation
-		if (m_PlayerDeathAnimationTimer >= 5.f)
+		if (m_PlayerDeathAnimationTimer >= 6.f)
 		{
 			if (m_health <= 0)
 			{
@@ -113,7 +135,7 @@ void dae::PlayerComponent::Update(float deltaTime)
 		m_levelManager.SetCell(cellX, cellY, LevelObjectType::empty);
 
 		auto& soundSystem = dae::serviceLocator::GetSoundSystem();
-		soundSystem.playSound(1, 1.f);
+		soundSystem.playSound(1, 1.f, false);
 
 		Notify(Event::ScoreChanged, m_parent);
 
@@ -138,7 +160,7 @@ void dae::PlayerComponent::Update(float deltaTime)
 		m_levelManager.SetCell(cellX, cellY, LevelObjectType::empty);
 
 		auto& soundSystem = dae::serviceLocator::GetSoundSystem();
-		soundSystem.playSound(1, 1.f);
+		soundSystem.playSound(1, 1.f, false);
 
 		Notify(Event::ScoreChanged, m_parent);
 	}
@@ -167,21 +189,25 @@ void dae::PlayerComponent::Update(float deltaTime)
 
 		if (movementDirection == TunnelDirection::left)
 		{
+			ChangePlayerTextureDirection(TunnelDirection::left);
 			m_parent->SetPosition(worldX, cellOriginY + (LevelManager::m_tileHeight * 0.15f));
 			m_tunnelProgress = (cellOriginX + LevelManager::m_tileWidth - probeX) / LevelManager::m_tileWidth;
 		}
 		else if (movementDirection == TunnelDirection::right)
 		{
+			ChangePlayerTextureDirection(TunnelDirection::right);
 			m_parent->SetPosition(worldX, cellOriginY + (LevelManager::m_tileHeight * 0.15f));
 			m_tunnelProgress = (probeX - cellOriginX) / LevelManager::m_tileWidth;
 		}
 		else if (movementDirection == TunnelDirection::up)
 		{
+			ChangePlayerTextureDirection(TunnelDirection::up);
 			m_parent->SetPosition(cellOriginX + (LevelManager::m_tileWidth * 0.15f), worldY);
 			m_tunnelProgress = (cellOriginY + LevelManager::m_tileHeight - probeY) / LevelManager::m_tileHeight;
 		}
 		else if (movementDirection == TunnelDirection::down)
 		{
+			ChangePlayerTextureDirection(TunnelDirection::down);
 			m_parent->SetPosition(cellOriginX + (LevelManager::m_tileWidth * 0.15f), worldY);
 			m_tunnelProgress = (probeY - cellOriginY) / LevelManager::m_tileHeight;
 		}

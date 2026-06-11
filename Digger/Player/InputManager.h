@@ -7,6 +7,8 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <MenuComponent.h>
+#include <ServiceLocator.h>
+#include "SdlSoundSystem.h"
 
 namespace dae
 {
@@ -101,16 +103,16 @@ namespace dae
 		}
 	};
 
-	class damageCommand : public GameObjectCommand {
+	class shootCommand : public GameObjectCommand {
+	private:
 		dae::PlayerComponent* m_playerComponent;
 	public:
-		explicit damageCommand(dae::GameObject* gameObject, dae::PlayerComponent* playerComponent) : GameObjectCommand(gameObject), m_playerComponent(playerComponent)
-		{
-		}
+		shootCommand(dae::GameObject* gameObject, PlayerComponent* playerComponent)
+			: GameObjectCommand(gameObject), m_playerComponent(playerComponent) {}
+
 		void Execute() override {
-			if (m_playerComponent != nullptr)
-			{
-				static_cast<PlayerComponent*>(m_playerComponent)->SubtractHealth(1);
+			if (m_playerComponent != nullptr) {
+				m_playerComponent->ShootProjectile(m_playerComponent->GetLockedMovementDirection());
 			}
 		}
 	};
@@ -154,6 +156,25 @@ namespace dae
 		void Execute() override {
 			if (m_pMenuComponent != nullptr) {
 				m_pMenuComponent->ClickSelectedItem();
+			}
+		}
+	};
+
+	class SwitchMuteSoundCommand : public Command {
+
+	public:
+		SwitchMuteSoundCommand() {}
+
+		soundSystem& soundSystem = dae::serviceLocator::GetSoundSystem();
+
+		void Execute() override {
+			if (soundSystem.getIsMuted())
+			{
+				soundSystem.resumeAllSounds();
+			}
+			else
+			{
+				soundSystem.pauseAllSounds();
 			}
 		}
 	};

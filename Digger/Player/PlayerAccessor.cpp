@@ -36,3 +36,8 @@ void dae::PlayerAccessor::SetToStartingPositionAllPlayers()
 		player->SetToStartingPosition();
 	}
 }
+
+int dae::PlayerAccessor::GetNextPlayerNumber()
+{
+	return m_nextPlayerNumber++;
+}

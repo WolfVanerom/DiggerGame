@@ -24,7 +24,9 @@ namespace dae
         if (event == Event::RemainingLivesChanged)
         {
             m_enemySpawnManager.PauseEnemies();
+			m_enemySpawnManager.SwitchPauseSpawning();
             m_playerAccessor.SwitchLockAllPlayerControls();
+			m_soundSystem.playSound(4, 1.f, false);
             m_playerComponent->PlayDeathAnimation();
 
             if (m_textComponent && m_playerComponent)
@@ -35,6 +37,7 @@ namespace dae
         else if (event == Event::PlayerDeathAnimationFinished)
         {
 			m_enemySpawnManager.ClearEnemies();
+            m_enemySpawnManager.SwitchPauseSpawning();
 			m_playerAccessor.SetToStartingPositionAllPlayers();
 			m_playerAccessor.SwitchLockAllPlayerControls();
         }
