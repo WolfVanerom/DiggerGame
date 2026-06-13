@@ -40,6 +40,8 @@ namespace dae
 		};
 
 		bool m_isMuted{ false };
+		bool m_enabled{ true };
+		bool m_initialized{ false };
 
 		void workerLoop();
 		MIX_Audio* getOrLoadAudio(const soundId id);
