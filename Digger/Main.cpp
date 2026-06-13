@@ -35,6 +35,7 @@
 #include <SdlGamePadSystem.h>
 #include "Player/PlayerDamageComponent.h"
 #include <algorithm>
+#include <NullSoundSystem.h>
 
 namespace fs = std::filesystem;
 
@@ -318,7 +319,11 @@ static void SaveScore()
 
 static void load() {
 	dae::serviceLocator::RegisterGameDataManager(std::make_unique<dae::GameDataManager>());
+#ifdef __EMSCRIPTEN__
+	dae::serviceLocator::RegisterSoundSystem(std::make_unique<dae::NullSoundSystem>());
+	#else
 	dae::serviceLocator::RegisterSoundSystem(std::make_unique<dae::SdlSoundSystem>());
+#endif
 	dae::serviceLocator::RegisterPlayerAccessor(std::make_unique<dae::PlayerAccessor>());
 	dae::serviceLocator::RegisterEnemySpawnManager(std::make_unique<dae::EnemySpawnManager>());
 	dae::serviceLocator::RegisterGamePadSystem(std::make_unique<dae::SdlGamePadSystem>());

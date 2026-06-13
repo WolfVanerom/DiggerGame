@@ -16,7 +16,7 @@ set(MINIGIN_SOURCES
   SdlSoundSystem.cpp
 )
 
-add_library(minigin STATIC ${MINIGIN_SOURCES} "SdlGamePadSystem.cpp" "HitBoxComponent.cpp")
+add_library(minigin STATIC ${MINIGIN_SOURCES} "SdlGamePadSystem.cpp" "HitBoxComponent.cpp" "NullSoundSystem.cpp")
 
 target_compile_features(minigin PUBLIC cxx_std_20)
 
