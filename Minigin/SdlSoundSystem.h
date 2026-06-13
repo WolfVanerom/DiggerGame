@@ -26,7 +26,7 @@ namespace dae
 		void resumeSound(const soundId id) override;
 		void pauseAllSounds(bool mute) override;
 		void resumeAllSounds() override;
-		bool getIsMuted() const;
+		bool getIsMuted() const override;
 
 	protected:
 		void processSound(const soundId id, const float volume, const bool loop);
