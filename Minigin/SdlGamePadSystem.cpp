@@ -31,9 +31,9 @@ namespace dae {
 		}
 	}
 
-	int SdlGamePadSystem::GetPlayerIdFromIndex(int index) const
+	int SdlGamePadSystem::GetPlayerIdFromIndex(size_t index) const
 	{
-		if (index < 0 || index >= m_Gamepads.size() || m_Gamepads[index] == nullptr) {
+		if (index < 0 || static_cast<size_t>(index) >= m_Gamepads.size() || m_Gamepads[index] == nullptr) {
 			return -1;
 		}
 		return m_Ids[index];
