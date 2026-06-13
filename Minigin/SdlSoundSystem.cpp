@@ -263,3 +263,4 @@ namespace dae
 			});
 		m_activeTracks.erase(newEnd, m_activeTracks.end());
 	}
+}
