@@ -1,4 +1,4 @@
-# Prog4Game Engine - Wolf Vanerom
+# Prog4Game Engine - Digger Game - Wolf Vanerom
 
 This is a rendition of the original Minigin project.  
 It has been extended into a custom game engine used to build a Digger-style arcade game.
@@ -127,4 +127,4 @@ This project uses GitHub Actions for continuous integration:
 
 # Repository
 
-https://github.com/WolfVanerom/minigin
+[https://github.com/WolfVanerom/DiggerGame](https://github.com/WolfVanerom/DiggerGame)
