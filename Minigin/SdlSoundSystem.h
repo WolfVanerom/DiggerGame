@@ -40,8 +40,6 @@ namespace dae
 		};
 
 		bool m_isMuted{ false };
-		bool m_isIsolated{ false };
-		MIX_Track* m_isolatedTrack = nullptr;
 
 		void workerLoop();
 		MIX_Audio* getOrLoadAudio(const soundId id);
