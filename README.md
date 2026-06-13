@@ -1,79 +1,130 @@
-﻿# Prog4Game Engine - Wolf Vanerom
+# Prog4Game Engine - Wolf Vanerom
 
-This is a rendition of the original minigin project. It is currently being adapted into a game engine to create a game project later on.
+This is a rendition of the original Minigin project.  
+It has been extended into a custom game engine used to build a Digger-style arcade game.
 
 [![Build Status](https://github.com/WolfVanerom/minigin/actions/workflows/cmake.yml/badge.svg)](https://github.com/avadae/cmake/actions)
 [![Build Status](https://github.com/WolfVanerom/minigin/actions/workflows/emscripten.yml/badge.svg)](https://github.com/avadae/emscripten/actions)
 
+---
+
 # Goal
 
-Creating an engine that is sufficent to create the game digger.
+The goal of this project is to build a functional and extensible game engine capable of running the game Digger.
 
-## Windows version
+---
 
-Either
-- Open the root folder in Visual Studio 2026; this will be recognized as a cmake project.
-  
-Or
-- Install CMake 
-- Install CMake and CMake Tools extensions in Visual Code
-- Open the root folder in Visual Code,  this will be recognized as a cmake project.
+# Engine Architecture
 
-Or
-- Use whatever editor you like :)
+This engine is built around a modular architecture.
 
-## Emscripten (web) version
+## Some Design Choices
 
-### On windows
+### Command Pattern (Input System)
+Input is fully decoupled from gameplay logic using the Command pattern.
 
-For installing all of the needed tools on Windows I recommend using [Chocolatey](https://chocolatey.org/). You can then run the following in a terminal to install what is needed:
+- Keyboard and gamepad inputs are mapped to commands
+- Supports single player, co-op, and versus modes
+- Menu navigation is also handled through commands
+- Every new category of comands is handled in a diffent list
 
-    choco install -y cmake
-    choco install -y emscripten
-    choco install -y ninja
-    choco install -y python
+---
 
-In a terminal, navigate to the root folder. Run this: 
+### Observer Pattern
+Was used for:
 
-    mkdir build_web
-    cd build_web
-    emcmake cmake ..
-    emmake ninja
+- Player → Score system
+- Player → Life system
 
-To be able to see the webpage you can start a python webserver in the build_web folder
+---
 
-    python -m http.server
+### State
+Statemachines where used for:
 
-Then browse to http://localhost:8000 and you're good to go.
+- Gold bag
+- Enemies
 
-### On OSX
+Largley because they cahange the most during gameplay.
 
-On Mac you can use homebrew
+---
 
-    brew install cmake
-    brew install emscripten
-    brew install python
+### Multithreading 
 
-In a terminal on OSX, navigate to the root folder. Run this: 
+Was used for the audio system to play without stopping gameplay.
 
-    mkdir build_web
-    cd build_web
-    emcmake cmake .. -DCMAKE_OSX_ARCHITECTURES=""
-    emmake make
+---
 
-To be able to see the webpage you can start a python webserver in the build_web folder
+### Service Locator
+Global systems are accessed via a service locator to easily access seperate parts of the program:
 
-    python3 -m http.server
+- SoundSystem
+- GameDataManager
+- EnemySpawnManager
+- PlayerAccessor
 
-Then browse to http://localhost:8000 and you're good to go.
+---
 
-## Github Actions
+# Game Features
 
-This project is build with github actions.
-- The CMake workflow builds the project in Debug and Release for Windows and serves as a check that the project builds on that platform.
-- The Emscripten workflow generates a web version of the project and publishes it as a [github page](https://avadae.github.io/minigin/). 
-  - The url of that page will be `https://<username>.github.io/<repository>/`
-- You can embed this page with 
+The engine supports the following gameplay features:
 
-```<iframe style="position: absolute; top: 0px; left: 0px; width: 1024px; height: 576px;" src="https://<username>.github.io/<repository>/" loading="lazy"></iframe>```
+- Single player mode
+- Co-op mode
+- Versus mode
+- Multi-level system (level loading from files)
+- Enemy system (Nobbin / Hobbin behavior)
+- Collectibles (emeralds, gold bags, bonus items)
+- Scoring system
+- Persistent high score system (file-based)
+- Lives system
+- Audio system (music + effects)
+- Menu system with full input support
 
+---
+
+# Controls
+
+## Menu Controls
+- Keyboard: WASD + Arrow keys + Enter
+- Controller: D-pad + A button
+
+## Gameplay
+- Player 1: WASD + Space (shoot)
+- Player 2: Arrow keys + Right Shift (shoot)
+
+Both players support keyboard and controller input.
+
+---
+
+# Build Instructions
+
+## Windows
+- Open the project in Visual Studio 2026 (CMake supported)
+OR
+- Use CMake + Ninja
+
+## Web (Emscripten)
+- Build using emcmake + emmake
+- Run local Python server to test browser version
+
+---
+
+# Github Actions
+
+This project uses GitHub Actions for continuous integration:
+
+- CMake workflow: builds Windows Debug + Release
+- Emscripten workflow: builds web version and publishes it as a GitHub Pages build
+
+---
+
+# Known Limitations
+
+- Audio system is limited or disabled in web builds due to platform constraints
+- Minor differences between desktop and web builds
+
+---
+
+# Repository
+
+https://github.com/WolfVanerom/minigin
