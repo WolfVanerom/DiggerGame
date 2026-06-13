@@ -45,6 +45,38 @@ namespace dae
 		return glm::vec3(0.f, 0.f, 0.f);
 	}
 
+	glm::vec3 EnemyState::DistanceToDirectionDigging()
+	{
+		m_pEnemyComponent->m_Position = m_pEnemyComponent->m_parent->GetWorldPosition();
+		m_pEnemyComponent->m_PlayerPosition = m_pPlayerComponent->GetParent()->GetWorldPosition();
+		auto differenceX = m_pEnemyComponent->m_PlayerPosition.x - m_pEnemyComponent->m_Position.x;
+		auto differenceY = m_pEnemyComponent->m_PlayerPosition.y - m_pEnemyComponent->m_Position.y;
+
+		float preferredOffsetX = 0.f;
+		float preferredOffsetY = 0.f;
+		float secondaryOffsetX = 0.f;
+		float secondaryOffsetY = 0.f;
+
+		if (std::abs(differenceX) >= std::abs(differenceY)) {
+			preferredOffsetX = DirectionToMoveOffset(true);
+			secondaryOffsetY = DirectionToMoveOffset(false);
+		}
+		else {
+			preferredOffsetY = DirectionToMoveOffset(false);
+			secondaryOffsetX = DirectionToMoveOffset(true);
+		}
+
+		if ((preferredOffsetX != 0.f or preferredOffsetY != 0.f) ) {
+			return glm::vec3(preferredOffsetX, preferredOffsetY, 0.f);
+		}
+
+		if ((secondaryOffsetX != 0.f or secondaryOffsetY != 0.f) ) {
+			return glm::vec3(secondaryOffsetX, secondaryOffsetY, 0.f);
+		}
+
+		return glm::vec3(0.f, 0.f, 0.f);
+	}
+
 	float EnemyState::DirectionToMoveOffset(bool calculateX)
 	{
 		if (calculateX) {
@@ -123,25 +155,16 @@ namespace dae
 		const auto currentCellY = static_cast<int>(std::round(m_pEnemyComponent->m_Position.y / LevelManager::m_tileHeight));
 		const float cellOriginX = static_cast<float>(currentCellX) * LevelManager::m_tileWidth;
 		const float cellOriginY = static_cast<float>(currentCellY) * LevelManager::m_tileHeight;
-		const float centerTolerance = 2.0f;
 
 		if (m_pEnemyComponent->m_Direction.x == 0.f and m_pEnemyComponent->m_Direction.y == 0.f) {
 			m_pEnemyComponent->m_Direction = DistanceToDirection();
 		}
 
 		bool canMoveCurrentDirection = FindNextCellInDirection(m_pEnemyComponent->m_Direction.x, m_pEnemyComponent->m_Direction.y);
-		bool hasPerpendicularOption = false;
 		const bool horizontalMove = m_pEnemyComponent->m_Direction.x != 0.f;
 		const bool verticalMove = m_pEnemyComponent->m_Direction.y != 0.f;
 
-		if (horizontalMove) {
-			hasPerpendicularOption = FindNextCellInDirection(0.f, 1.f) or FindNextCellInDirection(0.f, -1.f);
-		}
-		else if (verticalMove) {
-			hasPerpendicularOption = FindNextCellInDirection(1.f, 0.f) or FindNextCellInDirection(-1.f, 0.f);
-		}
-
-		if (!canMoveCurrentDirection or (hasPerpendicularOption)) {
+		if (!canMoveCurrentDirection) {
 			auto newDirection = DistanceToDirection();
 			if (newDirection.x != 0.f or newDirection.y != 0.f) {
 				m_pEnemyComponent->m_Direction = newDirection;
@@ -156,61 +179,83 @@ namespace dae
 
 		if (canMoveCurrentDirection) {
 			constexpr float enemyMoveSpeed{ 50.f };
-			const float moveStep = enemyMoveSpeed * deltaTime;
-			float nextX = m_pEnemyComponent->m_Position.x + (m_pEnemyComponent->m_Direction.x * moveStep);
-			float nextY = m_pEnemyComponent->m_Position.y + (m_pEnemyComponent->m_Direction.y * moveStep);
+		const float moveStep = enemyMoveSpeed * deltaTime;
+		float nextX = m_pEnemyComponent->m_Position.x + (m_pEnemyComponent->m_Direction.x * moveStep);
+		float nextY = m_pEnemyComponent->m_Position.y + (m_pEnemyComponent->m_Direction.y * moveStep);
 
-			if (horizontalMove) {
-				nextY = cellOriginY;
-			}
-			else if (verticalMove) {
-				nextX = cellOriginX;
-			}
-
-			m_pEnemyComponent->m_parent->SetPosition(nextX, nextY);
+		if (horizontalMove) {
+			nextY = cellOriginY;
+		}
+		else if (verticalMove) {
+			nextX = cellOriginX;
 		}
 
-		//for (auto* enemy : m_pEnemyComponent->m_enemySpawnManager.GetEnemies()) {
-		//	auto enemyCellX = static_cast<int>(std::round(enemy->m_Position.x / LevelManager::m_tileWidth));
-		//	auto enemyCellY = static_cast<int>(std::round(enemy->m_Position.y / LevelManager::m_tileHeight));
-		//	if (currentCellX == enemyCellX and currentCellY == enemyCellY) {
-		//		m_pEnemyComponent->SetState(m_pEnemyComponent->m_pHobbinState);
-		//		m_pEnemyComponent->m_pCurrentState->OnEnter();
-		//		return;
-		//	}
-		//}
+		m_pEnemyComponent->m_parent->SetPosition(nextX, nextY);
+		}
+
+		for (auto* enemy : m_pEnemyComponent->m_enemySpawnManager.GetEnemies()) {
+			if (enemy == m_pEnemyComponent) {
+				continue;
+			}
+			auto enemyCellX = static_cast<int>(std::round(enemy->m_Position.x / LevelManager::m_tileWidth));
+			auto enemyCellY = static_cast<int>(std::round(enemy->m_Position.y / LevelManager::m_tileHeight));
+			if (currentCellX == enemyCellX and currentCellY == enemyCellY) {
+				m_pEnemyComponent->SetState(m_pEnemyComponent->m_pHobbinState);
+				m_pEnemyComponent->m_pCurrentState->OnEnter();
+				return;
+			}
+		}
 	}
 
 	void HobbinState::OnEnter()
 	{
-		/*m_pEnemyComponent->m_pTextureComponent->SetTexture("media/clhob1.png");*/
+		m_pEnemyComponent->m_pTextureComponent->SetTexture("media/clhob1.png");
+		m_amountOfCellsTraveled = 0;
 	}
 	void HobbinState::OnExit()
 	{
 	}
-	void HobbinState::Update(float)
+
+	void HobbinState::Update(float deltaTime)
 	{
-		//auto moveToOffset = DistanceToDirection();
-		//m_pEnemyComponent->m_Position = m_pEnemyComponent->m_parent->GetWorldPosition();
-		//auto canMove = FindNextCellInDirection(moveToOffset.x, moveToOffset.y);
+		if (m_amountOfCellsTraveled >= 5) {
+			m_pEnemyComponent->SetState(m_pEnemyComponent->m_pNobbinState);
+			m_pEnemyComponent->m_pCurrentState->OnEnter();
+			return;
+		}
 
-		//if (canMove) {
-		//	m_pEnemyComponent->m_parent->SetPosition(m_pEnemyComponent->m_Position.x + moveToOffset.x, m_pEnemyComponent->m_Position.y + moveToOffset.y);
-		//}
+		m_pEnemyComponent->m_Position = m_pEnemyComponent->m_parent->GetWorldPosition();
 
-		//auto currentCellX = static_cast<int>(std::round(m_pEnemyComponent->m_Position.x / LevelManager::m_tileWidth));
-		//auto currentCellY = static_cast<int>(std::round(m_pEnemyComponent->m_Position.y / LevelManager::m_tileHeight));
+		const auto currentCellX = static_cast<int>(std::round(m_pEnemyComponent->m_Position.x / LevelManager::m_tileWidth));
+		const auto currentCellY = static_cast<int>(std::round(m_pEnemyComponent->m_Position.y / LevelManager::m_tileHeight));
+		const float cellOriginX = static_cast<float>(currentCellX) * LevelManager::m_tileWidth;
+		const float cellOriginY = static_cast<float>(currentCellY) * LevelManager::m_tileHeight;
+		
+		m_pEnemyComponent->m_Direction = DistanceToDirectionDigging();
 
-		//for (auto* enemy : m_pEnemyComponent->m_enemySpawnManager.GetEnemies()) {
-		//	auto enemyCellX = static_cast<int>(std::round(enemy->m_Position.x / LevelManager::m_tileWidth));
-		//	auto enemyCellY = static_cast<int>(std::round(enemy->m_Position.y / LevelManager::m_tileHeight));
-		//	if (currentCellX == enemyCellX and currentCellY == enemyCellY) {
-		//		m_pEnemyComponent->SetState(m_pEnemyComponent->m_pHobbinState);
-		//		m_pEnemyComponent->m_pCurrentState->OnEnter();
-		//		return;
-		//	}
-		//}
+		const bool horizontalMove = m_pEnemyComponent->m_Direction.x != 0.f;
+		const bool verticalMove = m_pEnemyComponent->m_Direction.y != 0.f;
+
+
+		constexpr float enemyMoveSpeed{ 80.f };
+		const float moveStep = enemyMoveSpeed * deltaTime;
+		float nextX = m_pEnemyComponent->m_Position.x + (m_pEnemyComponent->m_Direction.x * moveStep);
+		float nextY = m_pEnemyComponent->m_Position.y + (m_pEnemyComponent->m_Direction.y * moveStep);
+
+		if (horizontalMove) {
+			nextY = cellOriginY;
+			m_amountOfCellsTraveled++;
+			m_pEnemyComponent->m_levelManager.SetCell(currentCellX, currentCellY, LevelObjectType::horizontalTunnel);
+		}
+		else if (verticalMove) {
+			nextX = cellOriginX;
+			m_amountOfCellsTraveled++;
+			m_pEnemyComponent->m_levelManager.SetCell(currentCellX, currentCellY, LevelObjectType::verticalTunnel);
+		}
+
+		m_pEnemyComponent->m_parent->SetPosition(nextX, nextY);
 	}
+	
 
 	void PauseState::OnEnter()
 	{

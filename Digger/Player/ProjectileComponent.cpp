@@ -29,7 +29,7 @@ namespace dae
 		else if (m_Direction == TunnelDirection::up or m_Direction == TunnelDirection::down)
 		{
 			int cellX = static_cast<int>(std::round(m_parent->GetWorldPosition().x / LevelManager::m_tileWidth));
-			int nextCellY = static_cast<int>(std::round(m_parent->GetWorldPosition().y + m_MoveOffset.y / LevelManager::m_tileHeight));
+			int nextCellY = static_cast<int>(std::round((m_parent->GetWorldPosition().y + m_MoveOffset.y) / LevelManager::m_tileHeight));
 			auto cell = m_pLevelManager->GetCell(cellX, nextCellY);
 			if (cell == LevelObjectType::none or cell == LevelObjectType::empty)
 			{
@@ -37,7 +37,7 @@ namespace dae
 				return;
 			}
 		}
-		m_parent->SetPosition(m_parent->GetWorldPosition() + m_MoveOffset * deltaTime);
+		m_parent->SetPosition(m_parent->GetWorldPosition() + m_MoveOffset * deltaTime * m_MovementSpeed);
 	}
 
 	glm::vec3 ProjectileComponent::DirectionToMoveOffset(TunnelDirection direction)

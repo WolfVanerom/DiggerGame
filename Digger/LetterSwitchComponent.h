@@ -14,7 +14,7 @@ namespace dae
 		LetterSwitchComponent& operator=(const LetterSwitchComponent& other) = delete;
 		LetterSwitchComponent& operator=(LetterSwitchComponent&& other) = delete;
 		virtual ~LetterSwitchComponent() = default;
-		char GetLetter() const { return m_Letter; }
+		char GetLetter() const;
 		void NextLetter();
 		void PreviousLetter();
 	private:

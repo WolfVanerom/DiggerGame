@@ -1,5 +1,4 @@
 #pragma once
-
 #include "Component.h"
 #include "LevelManager.h"
 #include <map>

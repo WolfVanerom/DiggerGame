@@ -14,7 +14,6 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   Level/GoldState.cpp
   Level/LevelManager.cpp
   Level/TileMapComponent.cpp
-  Player/DeathComponent.cpp
   Player/InputManager.cpp
   Player/LifeComponent.cpp
   Player/PlayerComponent.cpp
@@ -30,7 +29,8 @@ add_executable(${TARGET_NAME} ${TARGET_PARAM}
   Player/PlayerAccessor.cpp
   ButtonComponent.cpp
   LetterSwitchComponent.cpp
-  GameDataManager.cpp "Player/PlayerDamageComponent.cpp")
+  GameDataManager.cpp 
+  Player/PlayerDamageComponent.cpp)
 
 target_compile_features(${TARGET_NAME} PUBLIC cxx_std_20)
 

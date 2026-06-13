@@ -4,6 +4,7 @@
 #include "ResourceManager.h"
 #include "Renderer.h"
 #include "Component.h"
+#include <SDL3/SDL.h>
 
 void dae::GameObject::Update(float deltaTime){
 	for (const auto& component : m_components)
@@ -134,6 +135,11 @@ void dae::GameObject::SetLocalPosition(const glm::vec3& pos)
 {
 	m_transform.SetLocalPosition(pos);
 	SetPositionDirty();
+}
+
+const glm::vec3& dae::GameObject::GetLocalPosition() const
+{
+	return m_transform.GetLocalPosition();
 }
 
 const glm::vec3& dae::GameObject::GetWorldPosition()

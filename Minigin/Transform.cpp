@@ -1,5 +1,15 @@
 #include "Transform.h"
 
+const glm::vec3& dae::Transform::GetLocalPosition() const
+{
+	return m_localPosition;
+}
+
+const glm::vec3& dae::Transform::GetWorldPosition() const
+{
+	return m_worldPosition;
+}
+
 void dae::Transform::SetLocalPosition(const float x, const float y, const float z)
 {
 	m_localPosition.x = x;

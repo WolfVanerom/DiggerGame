@@ -16,6 +16,8 @@ namespace dae
 		EnemySpawnManager& m_enemySpawnManager{ dae::serviceLocator::GetEnemySpawnManager() };
 		PlayerAccessor& m_playerAccessor{ dae::serviceLocator::GetPlayerAccessor() };
 		soundSystem& m_soundSystem{ dae::serviceLocator::GetSoundSystem() };
+		GameDataManager& m_gameDataManager{ dae::serviceLocator::GetGameDataManager() };
+		bool m_isHandlingDeath{ false };
 	public:
 		LifeComponent(GameObject* pOwner, PlayerComponent* playerComponent, TextComponent* textComponent);
 		void Update(float deltaTime) override;

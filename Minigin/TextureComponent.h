@@ -17,9 +17,10 @@ namespace dae
 		void SetDrawSize(float width, float height);
 		void FlipHorizontal(bool flip);
 		void FlipVertical(bool flip);
+		void SetRotation(double angleDegrees);
 
-		float GetWidth() const { return m_drawSize.x; }
-		float GetHeight() const { return m_drawSize.y; }
+		float GetWidth() const;
+		float GetHeight() const;
 
 		explicit TextureComponent(GameObject* pOwner);
 		virtual ~TextureComponent() = default;
@@ -34,5 +35,6 @@ namespace dae
 		glm::vec2 m_drawSize{};
 		bool m_flipHorizontal{ false };
 		bool m_flipVertical{ false };
+		double m_rotation{ 0.0 };
 	};
 }

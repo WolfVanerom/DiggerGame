@@ -14,6 +14,7 @@ namespace dae {
 		virtual void Update(float deltaTime) = 0;
 	protected:
 		glm::vec3 DistanceToDirection();
+		glm::vec3 DistanceToDirectionDigging();
 		float DirectionToMoveOffset(bool calculateX);
 		bool FindNextCellInDirection(float offsetX, float offsetY);
 	};
@@ -30,6 +31,8 @@ namespace dae {
 		void OnEnter() override;
 		void OnExit() override;
 		void Update(float deltaTime) override;
+	private:
+		int m_amountOfCellsTraveled{ 0 };
 	};
 
 	class PauseState final : public EnemyState

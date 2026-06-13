@@ -38,7 +38,7 @@ namespace dae
 		HitboxLayer m_layer{};
 		glm::vec2 m_size{};
 		glm::vec2 m_offset{};
-		bool m_RenderThisHitbox{ true };
+		bool m_RenderThisHitbox{ false };
 
 		static std::vector<HitBoxComponent*>& GetHitboxes();
 	};

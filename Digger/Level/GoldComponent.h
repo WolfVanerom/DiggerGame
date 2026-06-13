@@ -20,8 +20,8 @@ namespace dae {
 		GoldComponent& operator=(GoldComponent&& other) = delete;
 		void Update(float deltaTime) override;
 		void SetState(GoldState* state) {m_pCurrentState = state; }
-		bool HasBroken() const { return m_Broken; }
-		bool IsDangerous() const { return typeid(*m_pCurrentState) == typeid(FallingState); }
+		bool HasBroken() const;
+		bool IsDangerous() const;
 	protected:
 		bool m_HasFallen{ false };
 		bool m_Broken{ false };

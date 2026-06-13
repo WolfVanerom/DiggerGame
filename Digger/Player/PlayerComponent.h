@@ -3,30 +3,32 @@
 #include "Observer.h"
 #include <memory>
 #include "LevelManager.h"
+#include "TextureComponent.h"
 
 namespace dae
 {
 	class ProjectileComponent;
-	class TextureComponent;
 	class PlayerComponent final : public Component, public subject
 	{
 	private:
-		int m_health{ 5 };
+		int m_maxHealth{ 4 };
+		int m_health{ 4 };
 		int m_score{ 0 };
+		int m_emeraldsCollected{ 0 };
 		int m_playerNumber{};
 
 		float m_PlayerDeathAnimationTimer{ 0.f };
 
-		int m_previousCellX{ -1 };
-		int m_previousCellY{ -1 };
+		int m_currentCellX{ -1 };
+		int m_currentCellY{ -1 };
 		float m_previousWorldX{ 0.f };
 		float m_previousWorldY{ 0.f };
 		float m_tunnelProgress{ 0.f };
 		bool m_isInTunnel{ false };
-		bool m_hasPreviousCell{ false };
 		bool m_goldBagPickup{ false };
-		bool m_isLocked{ false };
+		bool m_isLocked{ true };
 		bool m_isPlayingDeathAnimation{ false };
+
 		TunnelDirection m_previousMovementDirection{ TunnelDirection::none };
 		TunnelDirection m_lockedMovementDirection{ TunnelDirection::none };
 
@@ -53,26 +55,23 @@ namespace dae
 
 		void ShootProjectile(TunnelDirection direction);
 
+		void SetHealth(int health);
 		void SubtractHealth(int amount);
 		void PlayDeathAnimation();
 
-		int GetHealth() const { return m_health; }
-		int GetScore() const { return m_score; }
-		int GetPlayerNumber() const { return m_playerNumber; }
+		int GetHealth() const;
+		int GetMaxHealth() const;
+		int GetScore() const;
+		void AddScore(int score);
+		int GetPlayerNumber() const;
+		float GetTextureWidth() const;
+		float GetTextureHeight() const;
 
 		bool IsPlayerInCell(int cellX, int cellY) const;
 
-		TunnelDirection GetLockedMovementDirection() const { return m_lockedMovementDirection; }
+		TunnelDirection GetLockedMovementDirection();
 
-		bool CanMoveInDirection(TunnelDirection direction) const
-		{
-			return m_lockedMovementDirection == TunnelDirection::none or m_lockedMovementDirection == direction;
-		}
-		void SetLockedMovementDirection(TunnelDirection direction) {
-			if (m_isInTunnel == false)
-			{
-				m_lockedMovementDirection = direction;
-			}
-		}
+		bool CanMoveInDirection(TunnelDirection direction) const;
+		void SetLockedMovementDirection(TunnelDirection direction);
 	};
 }

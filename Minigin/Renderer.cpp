@@ -91,7 +91,7 @@ void dae::Renderer::RenderTexture(const Texture2D& texture, const float x, const
 	SDL_RenderTexture(GetSDLRenderer(), texture.GetSDLTexture(), &src, &dst);
 }
 
-void dae::Renderer::RenderTextureFlipped(const Texture2D& texture, const float x, const float y, const float width, const float height, const bool flipHorizontal, const bool flipVertical) const
+void dae::Renderer::RenderTextureRotated(const Texture2D& texture, float x, float y, float width, float height, bool flipHorizontal, double angle, bool flipVertical) const
 {
 	SDL_FlipMode flip = SDL_FLIP_NONE;
 
@@ -109,7 +109,7 @@ void dae::Renderer::RenderTextureFlipped(const Texture2D& texture, const float x
 	dst.w = width;
 	dst.h = height;
 
-	SDL_RenderTextureRotated(GetSDLRenderer(), texture.GetSDLTexture(), nullptr, &dst, 0.0, nullptr, flip);
+	SDL_RenderTextureRotated(GetSDLRenderer(), texture.GetSDLTexture(), nullptr, &dst, angle, nullptr, flip);
 }
 
 void dae::Renderer::RenderRect(const float x, const float y, const float width, const float height, const Uint8 r, const Uint8 g, const Uint8 b, const Uint8 a) const
@@ -124,3 +124,5 @@ void dae::Renderer::RenderRect(const float x, const float y, const float width, 
 }
 
 SDL_Renderer* dae::Renderer::GetSDLRenderer() const { return m_renderer; }
+
+const SDL_Color& dae::Renderer::GetBackgroundColor() const { return m_clearColor; }

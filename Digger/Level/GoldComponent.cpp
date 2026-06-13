@@ -29,5 +29,13 @@ namespace dae{
 		}
 	}
 
+	bool GoldComponent::HasBroken() const
+	{
+		return m_Broken;
+	}
 
+	bool GoldComponent::IsDangerous() const
+	{
+		return typeid(*m_pCurrentState) == typeid(FallingState);
+	}
 }

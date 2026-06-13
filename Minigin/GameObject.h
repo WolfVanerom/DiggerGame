@@ -36,7 +36,7 @@ namespace dae
 		void RemoveChild(GameObject* child);
 		bool IsChild(const GameObject* potentialChild) const;
 		
-		const glm::vec3& GetLocalPosition() const { return m_transform.GetLocalPosition(); }
+		const glm::vec3& GetLocalPosition() const;
 		const glm::vec3& GetWorldPosition();
 		void UpdateWorldPosition();
 		void SetPositionDirty();

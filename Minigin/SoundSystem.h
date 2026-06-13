@@ -11,7 +11,7 @@ namespace dae{
 		virtual void registerSound(const soundId id, const std::string& path) = 0;
 		virtual void pauseSound(const soundId id) = 0;
 		virtual void resumeSound(const soundId id) = 0;
-		virtual void pauseAllSounds() = 0;
+		virtual void pauseAllSounds(bool mute) = 0;
 		virtual void resumeAllSounds() = 0;
 		virtual bool getIsMuted() const = 0;
 	};

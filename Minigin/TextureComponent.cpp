@@ -22,7 +22,7 @@ void dae::TextureComponent::Render() const
 	{
 		if (m_flipHorizontal or m_flipVertical)
 		{
-			Renderer::GetInstance().RenderTextureFlipped(*m_texture, pos.x, pos.y, m_drawSize.x, m_drawSize.y, m_flipHorizontal, m_flipVertical);
+			Renderer::GetInstance().RenderTextureRotated(*m_texture, pos.x, pos.y, m_drawSize.x, m_drawSize.y, m_flipHorizontal, m_rotation, m_flipVertical);
 			return;
 		}
 		else {
@@ -78,4 +78,19 @@ void dae::TextureComponent::FlipHorizontal(const bool flip)
 void dae::TextureComponent::FlipVertical(const bool flip)
 {
 	m_flipVertical = flip;
+}
+
+void dae::TextureComponent::SetRotation(const double angleDegrees)
+{
+	m_rotation = angleDegrees;
+}
+
+float dae::TextureComponent::GetWidth() const
+{
+	return m_drawSize.x;
+}
+
+float dae::TextureComponent::GetHeight() const
+{
+	return m_drawSize.y;
 }

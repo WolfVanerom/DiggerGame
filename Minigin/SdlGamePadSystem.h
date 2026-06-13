@@ -15,7 +15,7 @@ namespace dae
 		SdlGamePadSystem& operator=(const SdlGamePadSystem& other) = delete;
 		SdlGamePadSystem& operator=(SdlGamePadSystem&& other) noexcept = delete;
 		void Initialize() override;
-		void update() override;
+		int GetPlayerIdFromIndex(int index) const;
 	private:
 		SDL_JoystickID* m_Ids{ nullptr };
 		std::vector<SDL_Gamepad*> m_Gamepads;

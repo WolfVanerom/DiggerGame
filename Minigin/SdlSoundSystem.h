@@ -24,22 +24,24 @@ namespace dae
 		void registerSound(const soundId id, const std::string& path) override;
 		void pauseSound(const soundId id) override;
 		void resumeSound(const soundId id) override;
-		void pauseAllSounds() override;
+		void pauseAllSounds(bool mute) override;
 		void resumeAllSounds() override;
 		bool getIsMuted() const;
 
 	protected:
 		void processSound(const soundId id, const float volume, const bool loop);
-
 	private:
 		struct SoundEvent
 		{
 			soundId id{};
 			float volume{};
 			bool loop{};
+			bool isIsolated{};
 		};
 
 		bool m_isMuted{ false };
+		bool m_isIsolated{ false };
+		MIX_Track* m_isolatedTrack = nullptr;
 
 		void workerLoop();
 		MIX_Audio* getOrLoadAudio(const soundId id);
@@ -58,7 +60,6 @@ namespace dae
 		std::vector<MIX_Track*> m_activeTracks{};
 	};
 #else
-	// Stub implementation when SDL3_mixer is not available
 	class SdlSoundSystem final : public soundSystem
 	{
 	public:
@@ -69,8 +70,9 @@ namespace dae
 		void registerSound(const soundId, const std::string&) override {}
 		void pauseSound(const soundId) override {}
 		void resumeSound(const soundId) override {}
-		void pauseAllSounds() override {}
+		void pauseAllSounds(bool mute) override {}
 		void resumeAllSounds() override {}
+		void playSoundIsolated(const soundId, const float, const bool) override {}
 	};
 #endif
 }

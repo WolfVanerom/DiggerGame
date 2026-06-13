@@ -1,5 +1,4 @@
 #pragma once
-
 namespace dae {
 
 	class GoldComponent;
@@ -31,6 +30,8 @@ namespace dae {
 	protected:
 		int m_AmountFallen{ 0 };
 		int m_PrevCellY{ -1 };
+		float m_FallDelayTimer{ 0.f };
+		float m_FallDelay{ 5.f };
 	public:
 		void OnEnter() override;
 		void OnExit() override;

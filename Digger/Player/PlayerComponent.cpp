@@ -45,15 +45,23 @@ void dae::PlayerComponent::ChangePlayerTextureDirection(TunnelDirection directio
 	switch (direction)
 	{
 	case TunnelDirection::up:
+		m_pTextureComponent->SetRotation(90);
 		m_pTextureComponent->FlipHorizontal(false);
+		m_pTextureComponent->FlipVertical(true);
 		break;
 	case TunnelDirection::down:
-		m_pTextureComponent->FlipHorizontal(false);
+		m_pTextureComponent->SetRotation(90);
+		m_pTextureComponent->FlipHorizontal(true);
+		m_pTextureComponent->FlipVertical(true);
 		break;
 	case TunnelDirection::left:
+		m_pTextureComponent->SetRotation(0);
+		m_pTextureComponent->FlipVertical(false);
 		m_pTextureComponent->FlipHorizontal(false);
 		break;
 	case TunnelDirection::right:
+		m_pTextureComponent->SetRotation(0);
+		m_pTextureComponent->FlipVertical(false);
 		m_pTextureComponent->FlipHorizontal(true);
 		break;
 	default:
@@ -65,6 +73,7 @@ dae::PlayerComponent::PlayerComponent(GameObject* pOwner, TextureComponent* pTex
 	:Component(pOwner), m_pTextureComponent(pTextureComponent)
 {
 	m_playerNumber = serviceLocator::GetPlayerAccessor().GetNextPlayerNumber();
+	m_startingPosition = m_parent->GetWorldPosition();
 }
 
 dae::PlayerComponent::~PlayerComponent()
@@ -83,6 +92,7 @@ void dae::PlayerComponent::Update(float deltaTime)
 				Notify(Event::PlayerDied, m_parent);
 			}
 			else {
+				m_pTextureComponent->SetTexture("media/cldig1.png");
 				Notify(Event::PlayerDeathAnimationFinished, m_parent);
 			}
 			m_isPlayingDeathAnimation = false;
@@ -125,25 +135,29 @@ void dae::PlayerComponent::Update(float deltaTime)
 		probeY += LevelManager::m_tileHeight * 0.35f;
 	}
 
-	const int cellX = static_cast<int>(probeX / LevelManager::m_tileWidth);
-	const int cellY = static_cast<int>(probeY / LevelManager::m_tileHeight);
-	const bool hasMovedToNewCell = m_hasPreviousCell && (cellX != m_previousCellX or cellY != m_previousCellY);
+	m_currentCellX = static_cast<int>(probeX / LevelManager::m_tileWidth);
+	m_currentCellY = static_cast<int>(probeY / LevelManager::m_tileHeight);
 
-	if (m_levelManager.GetCell(cellX, cellY) == LevelObjectType::emerald)
+	if (m_levelManager.GetCell(m_currentCellX, m_currentCellY) == LevelObjectType::emerald)
 	{
-		m_score += 100;
-		m_levelManager.SetCell(cellX, cellY, LevelObjectType::empty);
+		m_score += 25;
+		m_emeraldsCollected++;
+		m_levelManager.SetCell(m_currentCellX, m_currentCellY, LevelObjectType::empty);
+
+		if (m_emeraldsCollected == 8) {
+			m_score += 250;
+		}
 
 		auto& soundSystem = dae::serviceLocator::GetSoundSystem();
-		soundSystem.playSound(1, 1.f, false);
+		soundSystem.playSound(1, 0.5f, false);
 
 		Notify(Event::ScoreChanged, m_parent);
 
 		m_levelManager.CheckIfLevelCompleted();
 	}
-	else if(m_levelManager.GetCell(cellX, cellY) == LevelObjectType::bag)
+	else if(m_levelManager.GetCell(m_currentCellX, m_currentCellY) == LevelObjectType::bag)
 	{
-		auto* object = m_levelManager.GetEntityObjectFromCell(cellX, cellY);
+		auto* object = m_levelManager.GetEntityObjectFromCell(m_currentCellX, m_currentCellY);
 		if (object == nullptr)
 		{
 			return;
@@ -155,33 +169,21 @@ void dae::PlayerComponent::Update(float deltaTime)
 			return;
 		}
 
-		//SDL_Log("Gold collected at cell (%d, %d)", cellX, cellY);
-		m_score += 250;
-		m_levelManager.SetCell(cellX, cellY, LevelObjectType::empty);
+		//SDL_Log("Gold collected at cell (%d, %d)", m_currentCellX, m_currentCellY);
+		m_score += 500;
+		m_levelManager.SetCell(m_currentCellX, m_currentCellY, LevelObjectType::empty);
 
 		auto& soundSystem = dae::serviceLocator::GetSoundSystem();
-		soundSystem.playSound(1, 1.f, false);
+		soundSystem.playSound(1, 0.5f, false);
 
 		Notify(Event::ScoreChanged, m_parent);
 	}
 
-	if (!m_hasPreviousCell)
-	{
-		m_hasPreviousCell = true;
-		m_previousCellX = cellX;
-		m_previousCellY = cellY;
-		m_previousWorldX = worldX;
-		m_previousWorldY = worldY;
-		m_previousMovementDirection = movementDirection;
-		m_lockedMovementDirection = movementDirection;
-		m_levelManager.ClearTunnelPreview(m_parent);
-		return;
-	}
 
-	if (trailType != LevelObjectType::none)
+	if (LevelManager::GetInstance().GetCell(m_currentCellX, m_currentCellY) == LevelObjectType::empty)
 	{
-		const float cellOriginX = static_cast<float>(cellX) * LevelManager::m_tileWidth;
-		const float cellOriginY = static_cast<float>(cellY) * LevelManager::m_tileHeight;
+		const float cellOriginX = static_cast<float>(m_currentCellX) * LevelManager::m_tileWidth;
+		const float cellOriginY = static_cast<float>(m_currentCellY) * LevelManager::m_tileHeight;
 
 		if (m_tunnelProgress > 0.f) {
 			m_isInTunnel = true;
@@ -189,49 +191,54 @@ void dae::PlayerComponent::Update(float deltaTime)
 
 		if (movementDirection == TunnelDirection::left)
 		{
-			ChangePlayerTextureDirection(TunnelDirection::left);
 			m_parent->SetPosition(worldX, cellOriginY + (LevelManager::m_tileHeight * 0.15f));
 			m_tunnelProgress = (cellOriginX + LevelManager::m_tileWidth - probeX) / LevelManager::m_tileWidth;
 		}
 		else if (movementDirection == TunnelDirection::right)
 		{
-			ChangePlayerTextureDirection(TunnelDirection::right);
 			m_parent->SetPosition(worldX, cellOriginY + (LevelManager::m_tileHeight * 0.15f));
 			m_tunnelProgress = (probeX - cellOriginX) / LevelManager::m_tileWidth;
 		}
 		else if (movementDirection == TunnelDirection::up)
 		{
-			ChangePlayerTextureDirection(TunnelDirection::up);
 			m_parent->SetPosition(cellOriginX + (LevelManager::m_tileWidth * 0.15f), worldY);
 			m_tunnelProgress = (cellOriginY + LevelManager::m_tileHeight - probeY) / LevelManager::m_tileHeight;
 		}
 		else if (movementDirection == TunnelDirection::down)
 		{
-			ChangePlayerTextureDirection(TunnelDirection::down);
 			m_parent->SetPosition(cellOriginX + (LevelManager::m_tileWidth * 0.15f), worldY);
 			m_tunnelProgress = (probeY - cellOriginY) / LevelManager::m_tileHeight;
 		}
 
-
-		m_levelManager.SetTunnelPreview(m_parent, cellX, cellY, trailType, movementDirection, m_tunnelProgress);
+		m_levelManager.SetTunnelPreview(m_parent, m_currentCellX, m_currentCellY, trailType, movementDirection, m_tunnelProgress);
 
 		//SDL_Log("Tunnel progress: %f", m_tunnelProgress);
 
 		if (m_tunnelProgress >= 0.8f)
 		{
-			m_levelManager.SetCell(cellX, cellY, trailType);
-
-			m_previousCellX = cellX;
-			m_previousCellY = cellY;
+			m_levelManager.SetCell(m_currentCellX, m_currentCellY, trailType);
 
 			m_isInTunnel = false;
 
 			m_tunnelProgress = 0.f;
 		}
-
 	}
 	else
 	{
+		switch (movementDirection) {
+		case TunnelDirection::up:
+			ChangePlayerTextureDirection(TunnelDirection::up);
+			break;
+		case TunnelDirection::down:
+			ChangePlayerTextureDirection(TunnelDirection::down);
+			break;
+		case TunnelDirection::left:
+			ChangePlayerTextureDirection(TunnelDirection::left);
+			break;
+		case TunnelDirection::right:
+			ChangePlayerTextureDirection(TunnelDirection::right);
+			break;
+		}
 		m_levelManager.ClearTunnelPreview(m_parent);
 		m_isInTunnel = false;
 		m_tunnelProgress = 0.f;
@@ -260,7 +267,12 @@ bool dae::PlayerComponent::IsLocked() const
 
 void dae::PlayerComponent::ShootProjectile(TunnelDirection direction)
 {
-	m_levelManager.SpawnProjectileAt(m_previousCellX, m_previousCellY, direction);
+	m_levelManager.SpawnProjectileAt(m_currentCellX, m_currentCellY, direction);
+}
+
+void dae::PlayerComponent::SetHealth(int health)
+{
+	m_health = health;
 }
 
 void dae::PlayerComponent::SubtractHealth(int amount)
@@ -272,7 +284,45 @@ void dae::PlayerComponent::SubtractHealth(int amount)
 
 void dae::PlayerComponent::PlayDeathAnimation()
 {
+	m_pTextureComponent->SetTexture("media/cgrave5.png");
+	m_PlayerDeathAnimationTimer = 0.f;
 	m_isPlayingDeathAnimation = true;
+}
+
+int dae::PlayerComponent::GetHealth() const
+{
+	return m_health;
+}
+
+int dae::PlayerComponent::GetMaxHealth() const
+{
+	return m_maxHealth;
+}
+
+int dae::PlayerComponent::GetScore() const
+{
+	return m_score;
+}
+
+void dae::PlayerComponent::AddScore(int score)
+{
+	m_score += score;
+	Notify(Event::ScoreChanged, m_parent);
+}
+
+int dae::PlayerComponent::GetPlayerNumber() const
+{
+	return m_playerNumber;
+}
+
+float dae::PlayerComponent::GetTextureWidth() const
+{
+	return m_pTextureComponent->GetWidth();
+}
+
+float dae::PlayerComponent::GetTextureHeight() const
+{
+	return m_pTextureComponent->GetHeight();
 }
 
 bool dae::PlayerComponent::IsPlayerInCell(int cellX, int cellY) const
@@ -281,4 +331,22 @@ bool dae::PlayerComponent::IsPlayerInCell(int cellX, int cellY) const
 	const int playerCellX = static_cast<int>(worldPos.x / LevelManager::m_tileWidth);
 	const int playerCellY = static_cast<int>(worldPos.y / LevelManager::m_tileHeight);
 	return playerCellX == cellX && playerCellY == cellY;
+}
+
+TunnelDirection dae::PlayerComponent::GetLockedMovementDirection()
+{
+	return m_lockedMovementDirection;
+}
+
+bool dae::PlayerComponent::CanMoveInDirection(TunnelDirection direction) const
+{
+	return m_lockedMovementDirection == TunnelDirection::none or m_lockedMovementDirection == direction;
+}
+
+void dae::PlayerComponent::SetLockedMovementDirection(TunnelDirection direction)
+{
+	if (m_isInTunnel == false)
+	{
+		m_lockedMovementDirection = direction;
+	}
 }

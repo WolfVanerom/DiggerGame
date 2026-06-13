@@ -5,7 +5,7 @@ namespace dae {
 	{
 	public:
 		virtual ~GamePadSystem() = default;
-		virtual void update() = 0;
 		virtual void Initialize() = 0;
+		virtual int GetPlayerIdFromIndex(int index) const = 0;
 	};
 }

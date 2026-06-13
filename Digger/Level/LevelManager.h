@@ -46,7 +46,7 @@ namespace dae
 	class EnemySpawnManager;
 	class LevelManager final : public Singleton<LevelManager>
 	{
-	private:
+	protected:
 		GameObject* m_currentNonEntetyDraw{ nullptr };
 		GameObject* m_currentBackgroundObject{ nullptr };
 		std::vector<std::vector<GameObject*>> m_EntityObjects{};
@@ -69,7 +69,8 @@ namespace dae
 		char TypeToChar(LevelObjectType type) const;
 		std::string_view GetTextureForType(LevelObjectType type) const;
 		bool IsInBounds(int x, int y) const;
-	protected:
+
+
 		static constexpr int m_maxWidth{ 15 };
 		static constexpr int m_maxHeight{ 10 };
 		static constexpr float m_windowWidth{ 1024.f };
@@ -82,10 +83,17 @@ namespace dae
 
 		void LoadLevel(const std::string& levelFile, Scene* scene);
 		void ClearLevel();
+		void ResetLevelForGameStart();
+
 		void CheckIfLevelCompleted();
-		void ProcessPendingLevelLoad();
+
 		void QueueLevelLoad(const std::string& levelFile, Scene* scene);
-		void LowerEmeraldCount() { m_amountOfEmeralds--;}
+		void ProcessPendingLevelLoad();
+
+		void LowerEmeraldCount();
+		int GetCurrentLevelIndex() const;
+		void IncreaseCurrentLevelIndex();
+		Scene* GetCurrentScene() const;
 
 		void SpawnProjectileAt(int x, int y, TunnelDirection direction);
 		bool HasProjectileAt(int x, int y) const;

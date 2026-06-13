@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <Singleton.h>
+#include <HitBoxComponent.h>
 
 namespace dae
 {
@@ -21,20 +22,19 @@ namespace dae
 		void PauseEnemies();
 		void RemoveEnemy(EnemyComponent* enemy);
 		void ClearEnemies();
-		void SpawnBonusCherry();
 
 		void SetMaxEnemyCountForLevel(int level);
 
-		// Added accessor for enemy list
-		const std::vector<EnemyComponent*>& GetEnemies() const { return m_pEnemies; }
+		const std::vector<EnemyComponent*>& GetEnemies() const;
 
 	private:
-		int enemyCount{ 0 };
-		int currentMaxEnemyCount{ 4 };
+		int m_enemyCount{ 0 };
+		int m_currentMaxEnemyCount{ 4 };
 		std::vector<EnemyComponent*> m_pEnemies{};
+		std::vector<HitBoxComponent*> m_pEnemyHitboxes{};
 		std::vector<int> m_MaxEnemyCountPerLevel{ 4, 5, 6, 7, 8 };
 		float m_SpawnTimer{ 0.0f };
-		bool m_SpawningPaused{ false };
+		bool m_SpawningPaused{ true };
 		Scene* m_pScene{ nullptr };
 		PlayerComponent* m_pPlayerComponent{ nullptr };
 	};

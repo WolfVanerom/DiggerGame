@@ -4,6 +4,7 @@
 #include "EnemyComponent.h"
 #include "LevelManager.h"
 #include <HitBoxComponent.h>
+#include "PlayerComponent.h"
 
 namespace dae
 {
@@ -15,17 +16,48 @@ namespace dae
 
 	void EnemySpawnManager::Update(float deltaTime)
 	{
+		if (serviceLocator::GetGameDataManager().GetGameMode() == GameMode::Versus)
+		{
+			return;
+		}
+
 		m_SpawnTimer += deltaTime;
 		if (m_SpawnTimer >= 5.0f)
 		{
 			m_SpawnTimer = 0.0f;
 			SpawnEnemy(m_pScene);
 		}
+
+		for (auto* m_pEnemyHitbox : m_pEnemyHitboxes)
+		{
+			if (m_pEnemyHitbox == nullptr)
+			{
+				continue;
+			}
+			for (auto* other : HitBoxComponent::CheckAll())
+			{
+				if (other == nullptr || other == m_pEnemyHitbox) {
+					continue;
+				}
+				if (!m_pEnemyHitbox->Overlaps(*other)) {
+					continue;
+				}
+				if (other->GetLayer() == HitboxLayer::Item)
+				{
+					auto enemy = m_pEnemyHitbox->GetParent();
+					enemy->MarkForDeletion();
+					m_pEnemies.erase(std::remove(m_pEnemies.begin(), m_pEnemies.end(), static_cast<EnemyComponent*>(enemy->getComponent(typeid(EnemyComponent)))), m_pEnemies.end());
+					m_pEnemyHitboxes.erase(std::remove(m_pEnemyHitboxes.begin(), m_pEnemyHitboxes.end(), m_pEnemyHitbox), m_pEnemyHitboxes.end());
+					m_enemyCount--;
+					return;
+				}
+			}
+		}
 	}
 
 	void EnemySpawnManager::SpawnEnemy(Scene* scene)
 	{
-		if (scene == nullptr or enemyCount >= currentMaxEnemyCount or m_SpawningPaused)
+		if (scene == nullptr or m_enemyCount >= m_currentMaxEnemyCount or m_SpawningPaused)
 		{
 			return;
 		}
@@ -40,6 +72,7 @@ namespace dae
 		auto* enemyPtr = enemyComponent.get();
 
 		auto hitboxComponent = std::make_unique<HitBoxComponent>(go.get(), dae::HitboxLayer::Enemy, glm::vec2(LevelManager::m_tileWidth, LevelManager::m_tileHeight), glm::vec2(0, 0));
+		auto hitboxComponentPtr = hitboxComponent.get();
 
 		go->addComponent(std::move(textureComponent));
 		go->addComponent(std::move(hitboxComponent));
@@ -47,7 +80,8 @@ namespace dae
 
 		scene->Add(std::move(go));
 		m_pEnemies.push_back(enemyPtr);
-		enemyCount++;
+		m_pEnemyHitboxes.push_back(hitboxComponentPtr);
+		m_enemyCount++;
 	}
 
 	void EnemySpawnManager::SwitchPauseSpawning()
@@ -70,7 +104,8 @@ namespace dae
 		if (it != m_pEnemies.end())
 		{
 			m_pEnemies.erase(it);
-			enemyCount--;
+			m_enemyCount--;
+			m_pPlayerComponent->AddScore(250);
 		}
 	}
 
@@ -81,19 +116,17 @@ namespace dae
 			enemy->GetParent()->MarkForDeletion();
 		}
 		m_pEnemies.clear();
-		enemyCount = 0;
-	}
-
-	void EnemySpawnManager::SpawnBonusCherry()
-	{
-		if (enemyCount == currentMaxEnemyCount)
-		{
-			// Spawn bonus cherry logic here
-		}
+		m_pEnemyHitboxes.clear();
+		m_enemyCount = 0;
 	}
 
 	void EnemySpawnManager::SetMaxEnemyCountForLevel(int level)
 	{
-		currentMaxEnemyCount = m_MaxEnemyCountPerLevel[level-1];
+		m_currentMaxEnemyCount = m_MaxEnemyCountPerLevel[level-1];
+	}
+
+	const std::vector<EnemyComponent*>& EnemySpawnManager::GetEnemies() const
+	{
+		return m_pEnemies;
 	}
 }

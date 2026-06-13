@@ -13,6 +13,7 @@
 #include <ProjectileComponent.h>
 #include <Enemy/EnemySpawnManager.h>
 #include <HitBoxComponent.h>
+#include <SceneManager.h>
 
 void dae::LevelManager::CreateCurrentNonEntityDrawObject(Scene* scene)
 {
@@ -116,7 +117,7 @@ void dae::LevelManager::SpawnLevelObject(LevelObjectType type, int x, int y, Sce
 		auto goldComponent = std::make_unique<GoldComponent>(go.get());
 		go->addComponent(std::move(goldComponent));
 
-		auto hitboxComponent = std::make_unique<HitBoxComponent>(go.get(), dae::HitboxLayer::Item, glm::vec2(m_tileWidth, m_tileHeight), glm::vec2(0, 0));
+		auto hitboxComponent = std::make_unique<HitBoxComponent>(go.get(), dae::HitboxLayer::Item, glm::vec2(m_tileWidth/4, m_tileHeight/4), glm::vec2(m_tileWidth/3, m_tileHeight/2));
 		go->addComponent(std::move(hitboxComponent));
 
 		m_EntityObjects[y][x] = go.get();
@@ -420,20 +421,56 @@ std::vector<dae::TunnelPreview> dae::LevelManager::GetAllTunnelPreviews() const
 
 void dae::LevelManager::QueueLevelLoad(const std::string& levelFile, Scene* scene)
 {
+	if (m_currentLevelIndex >= 5) {
+		m_soundSystem.pauseAllSounds(false);
+		SceneManager::GetInstance().SetActiveScene(serviceLocator::GetGameDataManager().GetScoreSaveScene());
+		return;
+	}
 	m_soundSystem.playSound(5, 0.25f, false);
 	m_pendingLevelLoad = std::make_pair(levelFile, scene);
+}
+
+void dae::LevelManager::LowerEmeraldCount()
+{
+	m_amountOfEmeralds--;
+}
+
+int dae::LevelManager::GetCurrentLevelIndex() const
+{
+	return m_currentLevelIndex;
+}
+
+void dae::LevelManager::IncreaseCurrentLevelIndex()
+{
+	m_currentLevelIndex++;
+}
+
+void dae::LevelManager::ResetLevelForGameStart()
+{
+	m_currentLevelIndex = 1;
+	QueueLevelLoad("Data/levelData/1.txt", m_currentScene);
+}
+
+dae::Scene* dae::LevelManager::GetCurrentScene() const
+{
+	return m_currentScene;
 }
 
 void dae::LevelManager::SpawnProjectileAt(int x, int y, TunnelDirection direction)
 {
 	auto go = std::make_unique<GameObject>();
 	go->SetPosition(x * m_tileWidth, y * m_tileHeight);
+
 	auto textureComponent = std::make_unique<TextureComponent>(go.get());
 	textureComponent->SetTexture("media/cfire1.png");
 	textureComponent->SetDrawSize(m_tileWidth, m_tileHeight);
+
 	auto projectileComponent = std::make_unique<ProjectileComponent>(go.get(), direction);
 	go->addComponent(std::move(textureComponent));
 	go->addComponent(std::move(projectileComponent));
+
+	auto hitboxComponent = std::make_unique<HitBoxComponent>(go.get(), dae::HitboxLayer::Item, glm::vec2(m_tileWidth / 4, m_tileHeight / 4), glm::vec2(m_tileWidth / 3, m_tileHeight / 2));
+	go->addComponent(std::move(hitboxComponent));
 
 	m_projectileObjects[y][x] = go.get();
 	m_currentScene->Add(std::move(go));

@@ -7,8 +7,8 @@ namespace dae
 	class Transform final
 	{
 	public:
-		const glm::vec3& GetLocalPosition() const { return m_localPosition; }
-		const glm::vec3& GetWorldPosition() const { return m_worldPosition; }
+		const glm::vec3& GetLocalPosition() const;
+		const glm::vec3& GetWorldPosition() const;
 		void SetLocalPosition(float x, float y, float z = 0);
 		void SetLocalPosition(const glm::vec3& position);
 		void SetWorldPosition(float x, float y, float z = 0);

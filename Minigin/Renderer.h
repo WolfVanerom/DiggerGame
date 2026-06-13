@@ -20,13 +20,13 @@ namespace dae
 
 		void RenderTexture(const Texture2D& texture, float x, float y, float width, float height) const;
 		void RenderTexture(const Texture2D& texture, float x, float y, float width, float height, float srcX, float srcY, float srcWidth, float srcHeight) const;
-		void RenderTextureFlipped(const Texture2D& texture, float x, float y, float width, float height, bool flipHorizontal, bool flipVertical) const;
+		void RenderTextureRotated(const Texture2D& texture, float x, float y, float width, float height, bool flipHorizontal, double angle, bool flipVertical) const;
 
 		void RenderRect(float x, float y, float width, float height, Uint8 r, Uint8 g, Uint8 b, Uint8 a = 255) const;
 
 		SDL_Renderer* GetSDLRenderer() const;
 
-		const SDL_Color& GetBackgroundColor() const { return m_clearColor; }
+		const SDL_Color& GetBackgroundColor() const;
 		void SetBackgroundColor(const SDL_Color& color) { m_clearColor = color; }
 	};
 }

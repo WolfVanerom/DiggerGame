@@ -15,9 +15,8 @@ namespace dae
 
 	void PlayerDamageComponent::Update(float deltatime)
 	{
-		if (m_invulnrebilityTimer > 0.f)
+		if (m_isInvulnerable)
 		{
-			m_invulnrebilityTimer -= deltatime;
 			return;
 		}
 
@@ -35,7 +34,7 @@ namespace dae
 				if (other->GetLayer() == HitboxLayer::Enemy)
 				{
 					m_player->SubtractHealth(1);
-					m_invulnrebilityTimer = 0.75f;
+					m_isInvulnerable = true;
 					return;
 				}
 			}
@@ -46,10 +45,14 @@ namespace dae
 				if (gold && gold->IsDangerous())
 				{
 					m_player->SubtractHealth(1);
-					m_invulnrebilityTimer = 0.75f;
+					m_isInvulnerable = true;
 					return;
 				}
 			}
 		}
+	}
+	void PlayerDamageComponent::ReleaseInvulnerability()
+	{
+		m_isInvulnerable = false;
 	}
 }

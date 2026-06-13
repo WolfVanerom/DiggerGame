@@ -35,13 +35,7 @@ namespace dae {
 		}
 		virtual ~subject()=0;
 	protected:
-		virtual void Notify(Event event, GameObject* gameObject)
-		{
-			for (Observer* observer : m_observers)
-			{
-				observer->OnNotify(event, gameObject);
-			}
-		}
+		virtual void Notify(Event event, GameObject* gameObject);
 	private:
 		std::vector<Observer*> m_observers;
 	};

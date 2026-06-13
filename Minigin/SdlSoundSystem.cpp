@@ -1,6 +1,5 @@
 #include "SdlSoundSystem.h"
 #include <SDL3/SDL.h>
-#
 #include <algorithm>
 
 namespace dae
@@ -53,10 +52,11 @@ namespace dae
 
 	void SdlSoundSystem::playSound(const soundId id, const float volume, const bool loop)
 	{
-		{
-			std::lock_guard lock(m_queueMutex);
-			m_pendingEvents.push(SoundEvent{ id, std::clamp(volume, 0.0f, 1.0f), loop });
+		if (m_isMuted) {
+			return;
 		}
+		std::lock_guard lock(m_queueMutex);
+		m_pendingEvents.push(SoundEvent{ id, std::clamp(volume, 0.0f, 1.0f), loop });
 		m_queueCv.notify_one();
 	}
 
@@ -90,9 +90,9 @@ namespace dae
 		}
 	}
 
-	void SdlSoundSystem::pauseAllSounds()
+	void SdlSoundSystem::pauseAllSounds(bool mute)
 	{
-		m_isMuted = true;
+		m_isMuted = mute;
 		std::lock_guard lock(m_audioMutex);
 		for (auto track : m_activeTracks)
 		{
@@ -132,16 +132,21 @@ namespace dae
 		{
 			std::lock_guard lock(m_audioMutex);
 			audio = getOrLoadAudio(id);
+
 			if (audio == nullptr)
 			{
 				return;
 			}
 
+			SDL_PropertiesID props = SDL_CreateProperties();
+
+			SDL_SetNumberProperty(props, MIX_PROP_PLAY_LOOPS_NUMBER, loop ? -1 : 0);
+
 			for (auto track : m_activeTracks)
 			{
 				if (track != nullptr && MIX_GetTrackAudio(track) == audio)
 				{
-					MIX_PlayTrack(track, loop ? -1 : 0);
+					MIX_PlayTrack(track, props);
 				}
 			}
 
@@ -161,7 +166,7 @@ namespace dae
 			{
 			}
 
-			if (!MIX_PlayTrack(track, loop ? -1 : 0))
+			if (!MIX_PlayTrack(track, props))
 			{
 				MIX_DestroyTrack(track);
 				return;
@@ -223,8 +228,11 @@ namespace dae
 	void SdlSoundSystem::cleanupFinishedTracks()
 	{
 		std::lock_guard lock(m_audioMutex);
+		if (m_isMuted) {
+			return;
+		}
 		auto newEnd = std::remove_if(m_activeTracks.begin(), m_activeTracks.end(), [](MIX_Track* track)
-			{
+		{
 				if (track == nullptr)
 				{
 					return true;
@@ -237,7 +245,7 @@ namespace dae
 				}
 
 				return false;
-			});
+		});
 
 		m_activeTracks.erase(newEnd, m_activeTracks.end());
 	}

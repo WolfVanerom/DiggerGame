@@ -13,6 +13,11 @@ namespace dae
 		}
 	}
 
+	char LetterSwitchComponent::GetLetter() const
+	{
+		return m_Letter;
+	}
+
 	void LetterSwitchComponent::NextLetter()
 	{
 		auto it = std::find(m_Alphabet.begin(), m_Alphabet.end(), m_Letter);
