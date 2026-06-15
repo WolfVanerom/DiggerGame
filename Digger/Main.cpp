@@ -86,6 +86,7 @@ static void StartGameFromMenu()
 	dae::serviceLocator::GetPlayerAccessor().SwitchLockAllPlayerControls();
 	dae::serviceLocator::GetEnemySpawnManager().SwitchPauseSpawning();
 	dae::serviceLocator::GetSoundSystem().playSound(2, 0.25f, true);
+	dae::InputManager::GetInstance().SwitchIsInMenuContext();
 }
 
 static void StartCoOpGameFromMenu()
@@ -126,6 +127,7 @@ static void StartCoOpGameFromMenu()
 	dae::InputManager::GetInstance().AddCommandControllerPlayer2(SDL_GAMEPAD_BUTTON_DPAD_DOWN, std::make_unique<dae::moveCommand>(go.get(), playerComponentPtr2, 0.0f, 10.0f));
 	dae::InputManager::GetInstance().AddCommandControllerPlayer2(SDL_GAMEPAD_BUTTON_DPAD_LEFT, std::make_unique<dae::moveCommand>(go.get(), playerComponentPtr2, -10.0f, 0.0f));
 	dae::InputManager::GetInstance().AddCommandControllerPlayer2(SDL_GAMEPAD_BUTTON_DPAD_RIGHT, std::make_unique<dae::moveCommand>(go.get(), playerComponentPtr2, 10.0f, 0.0f));
+	dae::InputManager::GetInstance().AddCommandControllerPlayer2(SDL_GAMEPAD_BUTTON_EAST, std::make_unique<dae::shootCommand>(go.get(), playerComponentPtr2));
 
 	auto scoreComponent2 = std::make_unique<dae::ScoreComponent>(go.get(), playerComponentPtr2, scoreTextComponentPtr);
 	auto* scoreComponentPtr2 = scoreComponent2.get();
@@ -188,6 +190,7 @@ static void StartVersusGameFromMenu()
 	dae::InputManager::GetInstance().AddCommandControllerPlayer2(SDL_GAMEPAD_BUTTON_DPAD_DOWN, std::make_unique<dae::moveCommand>(go.get(), playerComponentPtr2, 0.0f, 10.0f));
 	dae::InputManager::GetInstance().AddCommandControllerPlayer2(SDL_GAMEPAD_BUTTON_DPAD_LEFT, std::make_unique<dae::moveCommand>(go.get(), playerComponentPtr2, -10.0f, 0.0f));
 	dae::InputManager::GetInstance().AddCommandControllerPlayer2(SDL_GAMEPAD_BUTTON_DPAD_RIGHT, std::make_unique<dae::moveCommand>(go.get(), playerComponentPtr2, 10.0f, 0.0f));
+	dae::InputManager::GetInstance().AddCommandControllerPlayer2(SDL_GAMEPAD_BUTTON_EAST, std::make_unique<dae::shootCommand>(go.get(), playerComponentPtr2));
 
 	auto currentGameMode = dae::serviceLocator::GetGameDataManager().GetGameMode();
 
@@ -606,6 +609,7 @@ static void load() {
 	dae::InputManager::GetInstance().AddCommandControllerPlayer1(SDL_GAMEPAD_BUTTON_DPAD_DOWN, std::make_unique<dae::moveCommand>(go.get(), playerComponentPtr, 0.0f, 10.0f));
 	dae::InputManager::GetInstance().AddCommandControllerPlayer1(SDL_GAMEPAD_BUTTON_DPAD_LEFT, std::make_unique<dae::moveCommand>(go.get(), playerComponentPtr, -10.0f, 0.0f));
 	dae::InputManager::GetInstance().AddCommandControllerPlayer1(SDL_GAMEPAD_BUTTON_DPAD_RIGHT, std::make_unique<dae::moveCommand>(go.get(), playerComponentPtr, 10.0f, 0.0f));
+	dae::InputManager::GetInstance().AddCommandControllerPlayer1(SDL_GAMEPAD_BUTTON_EAST, std::make_unique<dae::shootCommand>(go.get(), playerComponentPtr));
 
 	auto scoreComponent = std::make_unique<dae::ScoreComponent>(go.get(), playerComponentPtr, scoreTextComponentPtr);
 	auto* scoreComponentPtr = scoreComponent.get();

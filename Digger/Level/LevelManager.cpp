@@ -458,6 +458,10 @@ dae::Scene* dae::LevelManager::GetCurrentScene() const
 
 void dae::LevelManager::SpawnProjectileAt(int x, int y, TunnelDirection direction)
 {
+	if (!IsInBounds(x, y))
+	{
+		return;
+	}
 	auto go = std::make_unique<GameObject>();
 	go->SetPosition(x * m_tileWidth, y * m_tileHeight);
 

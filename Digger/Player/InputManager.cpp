@@ -160,7 +160,15 @@ void dae::InputManager::InitializeControlerIds() {
 	m_Player2ControllerId = static_cast<SDL_JoystickID>(gamePadSystem.GetPlayerIdFromIndex(1));
 }
 
+void dae::InputManager::SwitchIsInMenuContext()
+{
+	m_IsInMenuContext = !m_IsInMenuContext;
+}
 
+bool dae::InputManager::GetIsInMenuContext() const
+{
+	return m_IsInMenuContext;
+}
 
 bool dae::InputManager::ProcessInput()
 {
@@ -193,6 +201,9 @@ bool dae::InputManager::ProcessInput()
 				if (m_commandsControllerPlayer2.find(e.gbutton.button) != m_commandsControllerPlayer2.end()) {
 					m_commandsControllerPlayer2[e.gbutton.button]->Execute();
 				}
+			}
+			if (!m_IsInMenuContext) {
+				return true;
 			}
 			if (m_activeMenuCommandsController->find(e.gbutton.button) != m_activeMenuCommandsController->end()) {
 				m_activeMenuCommandsController->at(e.gbutton.button)->Execute();

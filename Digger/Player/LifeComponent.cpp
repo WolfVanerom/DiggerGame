@@ -58,6 +58,7 @@ namespace dae
                 dae::InputManager::GetInstance().RemoveCommandsForGameObject(m_playerComponent->GetParent());
 				m_playerAccessor.RemovePlayer(m_playerComponent);
             }
+			dae::InputManager::GetInstance().SwitchIsInMenuContext();
 			dae::SceneManager::GetInstance().SetActiveScene(m_gameDataManager.GetScoreSaveScene());
 			dae::InputManager::GetInstance().ChangeMenuCommandContext(1);
             m_isHandlingDeath = false;

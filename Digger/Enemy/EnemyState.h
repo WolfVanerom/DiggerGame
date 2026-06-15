@@ -24,6 +24,8 @@ namespace dae {
 		void OnEnter() override;
 		void OnExit() override;
 		void Update(float deltaTime) override;
+	private:
+		int m_AmountOfPasses{ 0 };
 	};
 
 	class HobbinState final : public EnemyState

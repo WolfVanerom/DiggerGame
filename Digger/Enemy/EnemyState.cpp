@@ -142,6 +142,7 @@ namespace dae
 
 	void NobbinState::OnEnter()
 	{
+		m_AmountOfPasses = 0;
 		m_pEnemyComponent->m_pTextureComponent->SetTexture("media/cnob1.png");
 	}
 	void NobbinState::OnExit()
@@ -199,7 +200,8 @@ namespace dae
 			}
 			auto enemyCellX = static_cast<int>(std::round(enemy->m_Position.x / LevelManager::m_tileWidth));
 			auto enemyCellY = static_cast<int>(std::round(enemy->m_Position.y / LevelManager::m_tileHeight));
-			if (currentCellX == enemyCellX and currentCellY == enemyCellY) {
+			m_AmountOfPasses++;
+			if (currentCellX == enemyCellX and currentCellY == enemyCellY and m_AmountOfPasses >= 5) {
 				m_pEnemyComponent->SetState(m_pEnemyComponent->m_pHobbinState);
 				m_pEnemyComponent->m_pCurrentState->OnEnter();
 				return;

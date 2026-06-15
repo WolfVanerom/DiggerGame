@@ -104,6 +104,8 @@ namespace dae
 		SDL_JoystickID m_Player1ControllerId{};
 		SDL_JoystickID m_Player2ControllerId{};
 
+		bool m_IsInMenuContext{ true };
+		float m_TimePassedSinceLastProjectile{ 0 };
 		float m_ButtonRepeatDelay{ 2 };
 		float m_ButtonRepeatTimerPlayer1{ 0 };
 		float m_ButtonRepeatTimerPlayer2{ 0 };
@@ -113,6 +115,8 @@ namespace dae
 		void ChangeMenuCommandContextController(int menuContext);
 	public:
 		void InitializeControlerIds();
+		void SwitchIsInMenuContext();
+		bool GetIsInMenuContext() const;
 		bool ProcessInput();
 
 		void AddCommand(int key, std::unique_ptr<Command> command);
