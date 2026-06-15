@@ -8,15 +8,6 @@
 
 namespace dae
 {
-	static bool IsHorizontalConnector(const LevelObjectType type)
-	{
-		return type == LevelObjectType::horizontalTunnel or type == LevelObjectType::tunnelEnd;
-	}
-
-	static bool IsVerticalConnector(const LevelObjectType type)
-	{
-		return type == LevelObjectType::verticalTunnel or type == LevelObjectType::tunnelEnd;
-	}
 
 	TileMapComponent::TileMapComponent(GameObject* pOwner, float tileWidth, float tileHeight)
 		: Component(pOwner)
@@ -104,28 +95,6 @@ namespace dae
 				continue;
 			}
 		}
-	}
-
-	LevelObjectType TileMapComponent::GetConnectedTunnelType(size_t x, size_t y) const
-	{
-		if (m_tiles == nullptr or y >= m_tiles->size() or x >= m_tiles->at(y).size() or m_tiles->at(y).at(x) != LevelObjectType::tunnelEnd)
-		{
-			return LevelObjectType::none;
-		}
-
-        const bool hasHorizontalConnection = (x > 0 && IsHorizontalConnector(m_tiles->at(y).at(x - 1))) or (x + 1 < m_tiles->at(y).size() && IsHorizontalConnector(m_tiles->at(y).at(x + 1)));
-		if (hasHorizontalConnection)
-		{
-			return LevelObjectType::horizontalTunnel;
-		}
-
-       const bool hasVerticalConnection = (y > 0 && x < m_tiles->at(y - 1).size() && IsVerticalConnector(m_tiles->at(y - 1).at(x))) or (y + 1 < m_tiles->size() && x < m_tiles->at(y + 1).size() && IsVerticalConnector(m_tiles->at(y + 1).at(x)));
-		if (hasVerticalConnection)
-		{
-			return LevelObjectType::verticalTunnel;
-		}
-
-		return LevelObjectType::none;
 	}
 
 	void TileMapComponent::SetTiles(const std::vector<std::vector<LevelObjectType>>* tiles)
