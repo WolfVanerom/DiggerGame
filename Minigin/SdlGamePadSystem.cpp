@@ -25,6 +25,11 @@ namespace dae {
 			}
 		}
 
+		if (m_Gamepads.empty()) {
+			SDL_Log("No gamepads found");
+			return;
+		}
+
 		if (!m_Gamepads[0]) {
 			SDL_Log("Couldn't open gamepad 0");
 			return;
