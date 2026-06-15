@@ -73,7 +73,7 @@ The engine supports the following gameplay features:
 - Versus mode
 - Multi-level system (level loading from files)
 - Enemy system (Nobbin / Hobbin behavior)
-- Collectibles (emeralds, gold bags, bonus items)
+- Collectibles (emeralds, gold bags)
 - Scoring system
 - Persistent high score system (file-based)
 - Lives system
